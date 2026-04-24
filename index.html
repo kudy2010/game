@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ho<!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8"/>
@@ -17,6 +17,47 @@
     /* Mobile interaction polish */
     body{-webkit-text-size-adjust:100%;overscroll-behavior-y:none;}
     button, [role="button"]{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+
+    /* Global UI polish */
+    button{min-height:48px}
+    button:active{transform:translateY(1px)}
+    @media (max-width: 420px){
+      button{min-height:52px}
+    }
+
+    /* Tooltip (stats) */
+    @keyframes psTipIn{from{opacity:0;transform:translate(-50%,6px) scale(0.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+    .ps-tip{
+      position:absolute;
+      bottom:calc(100% + 10px);
+      left:50%;
+      transform:translateX(-50%);
+      width:min(260px, 78vw);
+      background:#1a1408;
+      border:1px solid #c8a44a;
+      border-radius:10px;
+      padding:10px 12px;
+      z-index:999;
+      box-shadow:0 10px 26px rgba(0,0,0,.78), 0 0 18px rgba(200,164,74,.18);
+      animation:psTipIn .16s ease-out;
+      pointer-events:none;
+    }
+    /* Mobile readability bump */
+    @media (max-width: 480px){
+      #root{-webkit-font-smoothing: antialiased;}
+    }
+    .ps-tip::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:100%;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:7px solid transparent;
+      border-right:7px solid transparent;
+      border-top:7px solid #c8a44a;
+      filter:drop-shadow(0 6px 8px rgba(0,0,0,.55));
+    }
   </style>
 </head>
 <body>
@@ -30,6 +71,20 @@
   <!-- React 18 — tylko te dwa pliki potrzebne, ~40KB łącznie -->
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script>
+    // If CDN scripts fail to load (common on iOS offline / blocked networks),
+    // the page will otherwise appear to "load forever".
+    setTimeout(function () {
+      if (window.React && window.ReactDOM) return;
+      var el = document.getElementById("loading");
+      if (!el) return;
+      el.innerHTML =
+        '<div style="font-size:18px;line-height:1.35;text-align:center;max-width:520px;padding:0 16px">' +
+        '⚠️ Nie udało się załadować biblioteki gry (React z CDN).<br/>' +
+        '<span style="color:#7a6030;font-size:13px">Upewnij się, że masz internet i otwierasz grę przez HTTP/HTTPS (np. GitHub Pages albo lokalny serwer), nie jako plik offline.</span>' +
+        '</div>';
+    }, 3500);
+  </script>
 
   <!-- localStorage polyfill for window.storage -->
   <script>
@@ -261,9 +316,18 @@ function pickReact(side, role, type) {
     return pool[Math.floor(Math.random() * pool.length)];
 }
 var CLASSES = {
-    musketeer: { name: "Musketeer", emoji: "🔫", desc: "Swift and deadly from afar.", stats: { str: 4, agi: 8, int: 5, con: 3 } },
-    knight: { name: "Knight", emoji: "⚔️", desc: "Unyielding steel on the battlefield.", stats: { str: 8, agi: 3, int: 3, con: 8 } },
-    alchemist: { name: "Alchemist", emoji: "⚗️", desc: "Explosive concoctions. Eyebrows optional.", stats: { str: 3, agi: 5, int: 10, con: 4 } },
+    musketeer: { name: "Musketeer", emoji: "🔫",
+        desc: "Swift and deadly from afar. Deals bonus damage with ranged weapons.",
+        preferredType: "ranged", primaryStat: "agi", secondaryStat: "str",
+        stats: { str: 4, agi: 8, int: 5, con: 3 } },
+    knight: { name: "Knight", emoji: "⚔️",
+        desc: "Unyielding steel on the battlefield. Deals bonus damage with physical weapons.",
+        preferredType: "physical", primaryStat: "str", secondaryStat: "con",
+        stats: { str: 8, agi: 3, int: 3, con: 8 } },
+    alchemist: { name: "Alchemist", emoji: "⚗️",
+        desc: "Explosive concoctions. Eyebrows optional. Deals bonus damage with magical weapons.",
+        preferredType: "magical", primaryStat: "int", secondaryStat: "agi",
+        stats: { str: 3, agi: 5, int: 10, con: 4 } },
 };
 var QUEST_ENEMIES = {
     1: { name: "Drunk Brawler", emoji: "🍺", hp: 53, stats: { str: 4, agi: 3, int: 1, con: 4 }, desc: "Smells of ale and regret." },
@@ -282,31 +346,72 @@ var QUESTS = [
     { id: 6, name: "Dragon's Powder Hoard", desc: "A dragon hoarding gunpowder. Genius or catastrophic.", travel: 30, minLevel: 8, xp: 350, gold: [120, 200], lootChance: 0.75 },
 ];
 var ITEMS = [
-    { id: "w1", name: "Rusty Flintlock", slot: "weapon", tier: 1, stats: { agi: 2, str: 1 }, price: 50, desc: "Fires occasionally. When it feels like it." },
-    { id: "w2", name: "Cavalry Saber", slot: "weapon", tier: 1, stats: { str: 3 }, price: 60, desc: "Slashing is more reliable than powder." },
-    { id: "w3", name: "Grenadier's Pack", slot: "weapon", tier: 2, stats: { int: 4, str: 1 }, price: 150, desc: "Contains 4 grenades. Usually." },
-    { id: "w4", name: "Repeating Musket", slot: "weapon", tier: 2, stats: { agi: 5, str: 2 }, price: 200, desc: "Fires 3 times before jamming spectacularly." },
-    { id: "w5", name: "Enchanted Zweihänder", slot: "weapon", tier: 3, stats: { str: 8, con: 2 }, price: 500, desc: "Glows when enemies are near. Also randomly." },
-    { id: "w6", name: "Alchemical Cannon", slot: "weapon", tier: 3, stats: { int: 7, str: 3 }, price: 600, desc: "Shoulder-mounted. Medically inadvisable." },
-    { id: "h1", name: "Leather Cap", slot: "helmet", tier: 1, stats: { con: 1 }, price: 30, desc: "Better than nothing. Barely." },
-    { id: "h2", name: "Morion Helmet", slot: "helmet", tier: 2, stats: { con: 3, agi: 1 }, price: 120, desc: "Tall crest deflects arrows and compliments." },
-    { id: "h3", name: "Full Plate Helm", slot: "helmet", tier: 3, stats: { con: 6, str: 1 }, price: 400, desc: "Vision: 30 degrees. Feature, not bug." },
-    { id: "a1", name: "Padded Gambeson", slot: "armor", tier: 1, stats: { con: 2 }, price: 40, desc: "Effective. Also incredibly sweaty." },
-    { id: "a2", name: "Chainmail Hauberk", slot: "armor", tier: 2, stats: { con: 4, str: 1 }, price: 180, desc: "Each ring lovingly machine-linked." },
-    { id: "a3", name: "Cuirassier Plate", slot: "armor", tier: 3, stats: { con: 7, str: 2 }, price: 550, desc: "Pistol-proof. Most of the time." },
-    { id: "b1", name: "Leather Boots", slot: "boots", tier: 1, stats: { agi: 2 }, price: 35, desc: "They go on your feet. Revolutionary." },
-    { id: "b2", name: "Cavalry Boots", slot: "boots", tier: 2, stats: { agi: 4, con: 1 }, price: 130, desc: "Great for riding. Awful for swimming." },
-    { id: "b3", name: "Alchemist's Greaves", slot: "boots", tier: 3, stats: { agi: 5, int: 3 }, price: 420, desc: "Infused with Haste. 40% more stumbling." },
-    { id: "ac1", name: "Powder Horn", slot: "accessory", tier: 1, stats: { agi: 1, int: 1 }, price: 45, desc: "For powder. Not for honking." },
-    { id: "ac2", name: "Officer's Sash", slot: "accessory", tier: 2, stats: { str: 2, int: 2 }, price: 160, desc: "Conveys authority. Catches spilled wine." },
-    { id: "ac3", name: "Philosopher's Compass", slot: "accessory", tier: 3, stats: { int: 6, agi: 2 }, price: 480, desc: "Currently pointing toward the tavern." },
-    { id: "w7", name: "Siege Pistol", slot: "weapon", tier: 2, stats: { str: 3, int: 3, agi: 2 }, price: 175, desc: "Too heavy for a holster. Too effective to ignore." },
-    { id: "w8", name: "Thunder Arquebus", slot: "weapon", tier: 3, stats: { str: 5, agi: 6, int: 4 }, price: 530, desc: "Takes 3 minutes to reload. Worth every second." },
-    { id: "h4", name: "Scout's Cap", slot: "helmet", tier: 2, stats: { agi: 4, int: 1 }, price: 110, desc: "Favored by those who prefer running to fighting." },
-    { id: "a4", name: "Scale Vest", slot: "armor", tier: 2, stats: { con: 5, agi: 1 }, price: 165, desc: "Scales from something. Best not to ask." },
-    { id: "b4", name: "Iron Sabatons", slot: "boots", tier: 3, stats: { con: 4, str: 3 }, price: 395, desc: "Heavy but reassuring." },
-    { id: "ac4", name: "Tactician's Tome", slot: "accessory", tier: 2, stats: { int: 3, str: 2 }, price: 145, desc: "Chapter 1: Don't die." },
-    { id: "ac5", name: "Hero's Crest", slot: "accessory", tier: 3, stats: { str: 4, agi: 4, con: 3 }, price: 455, desc: "You're borrowing it indefinitely." },
+    // ── Generic weapons (no dominant class) ──────────────────────────────────
+    { id:"w7",  name:"Siege Pistol",          slot:"weapon", tier:2, dmgType:"ranged",   stats:{str:3,int:3,agi:2},       price:175, desc:"Too heavy for a holster. Too effective to ignore." },
+    { id:"w8",  name:"Thunder Arquebus",       slot:"weapon", tier:3, dmgType:"ranged",   stats:{str:5,agi:6,int:4},       price:530, desc:"Takes 3 minutes to reload. Worth every second." },
+    // ── Knight weapons (physical) ─────────────────────────────────────────────
+    { id:"w2",  name:"Cavalry Saber",          slot:"weapon", tier:1, dmgType:"physical", stats:{str:3},                   price:60,  classTag:"knight",    desc:"Slashing is more reliable than powder." },
+    { id:"w5",  name:"Enchanted Zweihänder",   slot:"weapon", tier:3, dmgType:"physical", stats:{str:8,con:2},             price:500, classTag:"knight",    desc:"Glows when enemies are near. Also randomly." },
+    { id:"kw1", name:"War Hammer",             slot:"weapon", tier:2, dmgType:"physical", stats:{str:5,con:3},             price:185, classTag:"knight",    desc:"Designed to dent armour. And spirits." },
+    { id:"kw2", name:"Templar's Blade",        slot:"weapon", tier:3, dmgType:"physical", stats:{str:9,con:3},             price:525, classTag:"knight",    desc:"Blessed thrice. Still covered in blood." },
+    // ── Musketeer weapons (ranged) ────────────────────────────────────────────
+    { id:"w1",  name:"Rusty Flintlock",        slot:"weapon", tier:1, dmgType:"ranged",   stats:{agi:2,str:1},             price:50,  classTag:"musketeer", desc:"Fires occasionally. When it feels like it." },
+    { id:"w4",  name:"Repeating Musket",       slot:"weapon", tier:2, dmgType:"ranged",   stats:{agi:5,str:2},             price:200, classTag:"musketeer", desc:"Fires 3 times before jamming spectacularly." },
+    { id:"mw1", name:"Dueling Pistol",         slot:"weapon", tier:1, dmgType:"ranged",   stats:{agi:4,str:1},             price:65,  classTag:"musketeer", desc:"For arguments that demand a final word." },
+    { id:"mw2", name:"Long Rifle",             slot:"weapon", tier:3, dmgType:"ranged",   stats:{agi:8,str:3},             price:515, classTag:"musketeer", desc:"One shot, no second chances. Usually." },
+    // ── Alchemist weapons (magical) ───────────────────────────────────────────
+    { id:"w3",  name:"Grenadier's Pack",       slot:"weapon", tier:2, dmgType:"magical",  stats:{int:4,str:1},             price:150, classTag:"alchemist", desc:"Contains 4 grenades. Usually." },
+    { id:"w6",  name:"Alchemical Cannon",      slot:"weapon", tier:3, dmgType:"magical",  stats:{int:7,str:3},             price:600, classTag:"alchemist", desc:"Shoulder-mounted. Medically inadvisable." },
+    { id:"aw1", name:"Vial Launcher",          slot:"weapon", tier:1, dmgType:"magical",  stats:{int:3,agi:2},             price:70,  classTag:"alchemist", desc:"Flings volatile compounds with enthusiasm." },
+    { id:"aw2", name:"Arcane Mortar",          slot:"weapon", tier:2, dmgType:"magical",  stats:{int:6,agi:2},             price:215, classTag:"alchemist", desc:"Short-range devastation. In a good way." },
+    // ── Generic helmets ───────────────────────────────────────────────────────
+    { id:"h1",  name:"Leather Cap",            slot:"helmet", tier:1, stats:{con:1},                                       price:30,  desc:"Better than nothing. Barely." },
+    { id:"h2",  name:"Morion Helmet",          slot:"helmet", tier:2, stats:{con:3,agi:1},                                 price:120, desc:"Tall crest deflects arrows and compliments." },
+    { id:"h3",  name:"Full Plate Helm",        slot:"helmet", tier:3, stats:{con:6,str:1},                                 price:400, desc:"Vision: 30 degrees. Feature, not bug." },
+    { id:"h4",  name:"Scout's Cap",            slot:"helmet", tier:2, stats:{agi:4,int:1},                                 price:110, desc:"Favored by those who prefer running to fighting." },
+    // ── Generic armor ─────────────────────────────────────────────────────────
+    { id:"a1",  name:"Padded Gambeson",        slot:"armor",  tier:1, stats:{con:2},                                       price:40,  desc:"Effective. Also incredibly sweaty." },
+    // ── Knight armor (heavy) ──────────────────────────────────────────────────
+    { id:"a2",  name:"Chainmail Hauberk",      slot:"armor",  tier:2, stats:{con:4,str:1},                                 price:180, classTag:"knight",    desc:"Each ring lovingly machine-linked." },
+    { id:"a3",  name:"Cuirassier Plate",       slot:"armor",  tier:3, stats:{con:7,str:2},                                 price:550, classTag:"knight",    desc:"Pistol-proof. Most of the time." },
+    { id:"ka1", name:"Iron Hauberk",           slot:"armor",  tier:1, stats:{con:3,str:1},                                 price:55,  classTag:"knight",    desc:"Heavy, hot, and surprisingly comfortable." },
+    { id:"ka2", name:"Knight's Plate",         slot:"armor",  tier:2, stats:{con:6,str:2},                                 price:225, classTag:"knight",    desc:"Forged for charging. Not for dancing." },
+    { id:"ka3", name:"Templar Armour",         slot:"armor",  tier:3, stats:{con:10,str:3},                                price:610, classTag:"knight",    desc:"The kind of armour that ends sieges." },
+    // ── Musketeer armor (light) ───────────────────────────────────────────────
+    { id:"a4",  name:"Scale Vest",             slot:"armor",  tier:2, stats:{con:5,agi:1},                                 price:165, classTag:"musketeer", desc:"Scales from something. Best not to ask." },
+    { id:"ma1", name:"Leather Jerkin",         slot:"armor",  tier:1, stats:{agi:2,con:1},                                 price:45,  classTag:"musketeer", desc:"Light enough to run. Tough enough to matter." },
+    { id:"ma2", name:"Ranger's Coat",          slot:"armor",  tier:2, stats:{agi:4,con:2},                                 price:190, classTag:"musketeer", desc:"Long coat, long range, long odds." },
+    { id:"ma3", name:"Shadow Cloak",           slot:"armor",  tier:3, stats:{agi:7,con:2},                                 price:575, classTag:"musketeer", desc:"Difficult to see. Easy to fear." },
+    // ── Alchemist armor (robes) ───────────────────────────────────────────────
+    { id:"aa1", name:"Apprentice's Robe",      slot:"armor",  tier:1, stats:{int:2,agi:1},                                 price:45,  classTag:"alchemist", desc:"Stained with six substances. Intentionally." },
+    { id:"aa2", name:"Scholar's Vestment",     slot:"armor",  tier:2, stats:{int:4,con:1,agi:1},                           price:195, classTag:"alchemist", desc:"Pockets for everything. Including regret." },
+    { id:"aa3", name:"Arcane Regalia",         slot:"armor",  tier:3, stats:{int:7,agi:2,con:1},                           price:585, classTag:"alchemist", desc:"Woven from distilled knowledge. Somehow." },
+    // ── Generic boots ─────────────────────────────────────────────────────────
+    { id:"b1",  name:"Leather Boots",          slot:"boots",  tier:1, stats:{agi:2},                                       price:35,  desc:"They go on your feet. Revolutionary." },
+    // ── Knight boots ──────────────────────────────────────────────────────────
+    { id:"b4",  name:"Iron Sabatons",          slot:"boots",  tier:3, stats:{con:4,str:3},                                 price:395, classTag:"knight",    desc:"Heavy but reassuring." },
+    // ── Musketeer boots ───────────────────────────────────────────────────────
+    { id:"b2",  name:"Cavalry Boots",          slot:"boots",  tier:2, stats:{agi:4,con:1},                                 price:130, classTag:"musketeer", desc:"Great for riding. Awful for swimming." },
+    // ── Alchemist boots ───────────────────────────────────────────────────────
+    { id:"b3",  name:"Alchemist's Greaves",    slot:"boots",  tier:3, stats:{agi:5,int:3},                                 price:420, classTag:"alchemist", desc:"Infused with Haste. 40% more stumbling." },
+    // ── Generic accessories ───────────────────────────────────────────────────
+    { id:"ac1", name:"Powder Horn",            slot:"accessory", tier:1, stats:{agi:1,int:1},                              price:45,  desc:"For powder. Not for honking." },
+    { id:"ac2", name:"Officer's Sash",         slot:"accessory", tier:2, stats:{str:2,int:2},                              price:160, desc:"Conveys authority. Catches spilled wine." },
+    { id:"ac4", name:"Tactician's Tome",       slot:"accessory", tier:2, stats:{int:3,str:2},                              price:145, desc:"Chapter 1: Don't die." },
+    { id:"ac5", name:"Hero's Crest",           slot:"accessory", tier:3, stats:{str:4,agi:4,con:3},                        price:455, desc:"You're borrowing it indefinitely." },
+    // ── Knight accessories ────────────────────────────────────────────────────
+    { id:"kac1",name:"Battle Standard",        slot:"accessory", tier:1, stats:{str:2,con:1},                              price:50,  classTag:"knight",    desc:"Plant it. Rally. Win. Repeat." },
+    { id:"kac2",name:"Knight's Sigil",         slot:"accessory", tier:2, stats:{str:3,con:2},                              price:175, classTag:"knight",    desc:"Proof of fealty. And excellent credit." },
+    { id:"kac3",name:"Templar's Oath",         slot:"accessory", tier:3, stats:{str:5,con:4},                              price:495, classTag:"knight",    desc:"Sworn before god and three witnesses." },
+    // ── Musketeer accessories ─────────────────────────────────────────────────
+    { id:"mac1",name:"Bullet Pouch",           slot:"accessory", tier:1, stats:{agi:2},                                    price:40,  classTag:"musketeer", desc:"Suspiciously heavy for its size." },
+    { id:"mac2",name:"Spyglass",               slot:"accessory", tier:2, stats:{agi:3,int:1},                              price:155, classTag:"musketeer", desc:"See the enemy before they see you." },
+    { id:"mac3",name:"Marksman's Coin",        slot:"accessory", tier:3, stats:{agi:6,str:2},                              price:475, classTag:"musketeer", desc:"Heads: you live. Tails: they don't." },
+    // ── Alchemist accessories ─────────────────────────────────────────────────
+    { id:"ac3", name:"Philosopher's Compass",  slot:"accessory", tier:3, stats:{int:6,agi:2},                              price:480, classTag:"alchemist", desc:"Currently pointing toward the tavern." },
+    { id:"aac1",name:"Crystal Vial",           slot:"accessory", tier:1, stats:{int:2},                                    price:40,  classTag:"alchemist", desc:"Empty. For now." },
+    { id:"aac2",name:"Alchemist's Lens",       slot:"accessory", tier:2, stats:{int:3,agi:1},                              price:160, classTag:"alchemist", desc:"Magnifies both targets and mistakes." },
+    { id:"aac3",name:"Philosopher's Shard",    slot:"accessory", tier:3, stats:{int:7,con:1},                              price:500, classTag:"alchemist", desc:"Fragment of the real thing. Allegedly." },
 ];
 var QUEST_ENEMY_POOLS = {
     1: [QUEST_ENEMIES[1], { name: "Angry Cook", emoji: "🍳", hp: 48, stats: { str: 5, agi: 2, int: 1, con: 5 }, desc: "Armed with a skillet. Surprisingly lethal." },
@@ -374,23 +479,46 @@ var JOBS = [
 ];
 var BEER_MAX = 3;
 var BEER_RESTOCK_MS = 45 * 60 * 1000;
+// dmgType display helpers
+var DMG_TYPE_LABEL = { physical: "⚔ Physical", ranged: "🎯 Ranged", magical: "✨ Magical" };
+var DMG_TYPE_COLOR = { physical: "#e08844", ranged: "#44bbdd", magical: "#cc77ff" };
+var CLASS_TAG_INFO = {
+    knight:    { label: "⚔ Knight",  color: "#e08844", bg: "#2a1400" },
+    musketeer: { label: "🎯 Musk.",  color: "#44bbdd", bg: "#001a2a" },
+    alchemist: { label: "✨ Alch.",  color: "#cc77ff", bg: "#1a0028" },
+};
+function ItemBadges(it) {
+    var nodes = [];
+    if (it.dmgType) nodes.push(React.createElement("span", { key:"dt", style:{ fontSize:8, color:DMG_TYPE_COLOR[it.dmgType], background:"#0d0801", border:"1px solid "+DMG_TYPE_COLOR[it.dmgType]+"55", borderRadius:3, padding:"1px 4px", whiteSpace:"nowrap" } }, DMG_TYPE_LABEL[it.dmgType]));
+    if (it.classTag) { var ct = CLASS_TAG_INFO[it.classTag]; if(ct) nodes.push(React.createElement("span", { key:"ct", style:{ fontSize:8, color:ct.color, background:ct.bg, border:"1px solid "+ct.color+"55", borderRadius:3, padding:"1px 4px", whiteSpace:"nowrap" } }, ct.label)); }
+    if (!nodes.length) return null;
+    return React.createElement("div", { style:{ display:"flex", gap:3, marginTop:2, flexWrap:"wrap" } }, nodes);
+}
 function rollRound(atkS, defS) {
     if (Math.random() * 100 > clamp(60 + (atkS.agi - defS.agi) * 4 + (atkS._hitBonus || 0), 20, 95))
         return { type: "miss", dmg: 0 };
     if (Math.random() * 100 < clamp((defS.agi - atkS.agi) * 3 + (defS._dodgeBonus || 0), 0, 32))
         return { type: "dodge", dmg: 0 };
     var blocked = Math.random() * 100 < clamp(defS.con * 2 + (defS._blockBonus || 0), 0, 28);
-    var crit = Math.random() * 100 < clamp(atkS.agi * 2 + (atkS._critBonus || 0), 5, 50);
-    var base = (atkS.str || 0) * 3 + (atkS.agi || 0) + (atkS.int || 0) * 2;
-    var dmg = Math.max(1, rng(Math.floor(base * 0.8), Math.floor(base * 1.2)) - (defS.con || 0) * 2);
-    if (blocked)
-        dmg = Math.max(1, Math.floor(dmg * 0.42));
-    if (crit)
-        dmg = Math.floor(dmg * (1.6 + (atkS.int || 0) * 0.04));
+    var crit    = Math.random() * 100 < clamp(atkS.agi * 2 + (atkS._critBonus || 0), 5, 50);
+    var base;
+    var cls = atkS._class;
+    if      (cls === "knight")    base = (atkS.str||0)*4   + (atkS.con||0)*1;
+    else if (cls === "musketeer") base = (atkS.agi||0)*3.5 + (atkS.str||0)*1;
+    else if (cls === "alchemist") base = (atkS.int||0)*3.5 + (atkS.agi||0)*1;
+    else                          base = (atkS.str||0)*3   + (atkS.agi||0)*1 + (atkS.int||0)*2;
+    // +20% when weapon type matches class preference
+    var prefType = cls && CLASSES[cls] && CLASSES[cls].preferredType;
+    if (prefType && atkS._weaponDmgType && prefType === atkS._weaponDmgType) base *= 1.2;
+    var dmg = Math.max(1, rng(Math.floor(base * 0.8), Math.floor(base * 1.2)) - (defS.con||0) * 2);
+    if (blocked) dmg = Math.max(1, Math.floor(dmg * 0.42));
+    if (crit)    dmg = Math.floor(dmg * (1.6 + (atkS.int||0) * 0.04));
     return { type: crit ? "crit" : blocked ? "block" : "hit", dmg: dmg };
 }
 function computeStats(hero, eq) {
     var s = Object.assign({}, hero.stats);
+    s._class = hero.class;
+    s._weaponDmgType = (eq && eq.weapon && eq.weapon.dmgType) ? eq.weapon.dmgType : null;
     Object.values(eq).forEach(function (it) { if (!it)
         return; Object.keys(it.stats).forEach(function (k) { s[k] = (s[k] || 0) + it.stats[k]; }); });
     (hero.perks || []).forEach(function (pid) { var p = PERKS.find(function (x) { return x.id === pid; }); if (p && p.sB)
@@ -467,6 +595,105 @@ var ANIM_CSS = [
     "input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 1000px #150e04 inset !important;-webkit-text-fill-color:#c8a44a !important;border:1px solid #3a2a10 !important;transition:background-color 5000s ease-in-out 0s}",
     "input::placeholder{color:#4a3820 !important;opacity:1}",
 ].join("\n");
+
+// ── ICONS (pixel-art 32x32 PNG) ────────────────────────────────────────────────
+const ICONS = {
+    // Atrybuty
+    str: "assets/icons/str.png", agi: "assets/icons/agi.png",
+    int: "assets/icons/int.png", con: "assets/icons/con.png",
+    // Sloty (generic)
+    weapon: "assets/icons/weapon.png", helmet: "assets/icons/helmet.png",
+    armor: "assets/icons/armor.png",   boots: "assets/icons/boots.png",
+    accessory: "assets/icons/accessory.png",
+    // Mikstury
+    potion_small: "assets/icons/potion_small.png",
+    potion_medium: "assets/icons/potion_medium.png",
+    potion_large: "assets/icons/potion_large.png",
+    // Klasy
+    class_musketeer: "assets/icons/class_musketeer.png",
+    class_knight:    "assets/icons/class_knight.png",
+    class_alchemist: "assets/icons/class_alchemist.png",
+    // Przedmioty sklepowe
+    w1:"assets/icons/w1.png", w2:"assets/icons/w2.png", w3:"assets/icons/w3.png",
+    w4:"assets/icons/w4.png", w5:"assets/icons/w5.png", w6:"assets/icons/w6.png",
+    w7:"assets/icons/w7.png", w8:"assets/icons/w8.png",
+    h1:"assets/icons/h1.png", h2:"assets/icons/h2.png",
+    h3:"assets/icons/h3.png", h4:"assets/icons/h4.png",
+    a1:"assets/icons/a1.png", a2:"assets/icons/a2.png",
+    a3:"assets/icons/a3.png", a4:"assets/icons/a4.png",
+    b1:"assets/icons/b1.png", b2:"assets/icons/b2.png",
+    b3:"assets/icons/b3.png", b4:"assets/icons/b4.png",
+    ac1:"assets/icons/ac1.png", ac2:"assets/icons/ac2.png",
+    ac3:"assets/icons/ac3.png", ac4:"assets/icons/ac4.png",
+    ac5:"assets/icons/ac5.png",
+    // Przedmioty lochów
+    dr1:"assets/icons/dr1.png", dr2:"assets/icons/dr2.png",
+    dr3:"assets/icons/dr3.png", dr4:"assets/icons/dr4.png",
+    dr5:"assets/icons/dr5.png", dr6:"assets/icons/dr6.png",
+    de1:"assets/icons/de1.png", de2:"assets/icons/de2.png",
+    de3:"assets/icons/de3.png", de4:"assets/icons/de4.png",
+    de5:"assets/icons/de5.png", de6:"assets/icons/de6.png",
+    dl1:"assets/icons/dl1.png", dl2:"assets/icons/dl2.png",
+    dl3:"assets/icons/dl3.png", dl4:"assets/icons/dl4.png",
+    dl5:"assets/icons/dl5.png", dl6:"assets/icons/dl6.png",
+    // Przeciwnicy
+    enemy_drunk_brawler:"assets/icons/enemy_drunk_brawler.png",
+    enemy_angry_cook:"assets/icons/enemy_angry_cook.png",
+    enemy_tavern_thug:"assets/icons/enemy_tavern_thug.png",
+    enemy_bandit_leader:"assets/icons/enemy_bandit_leader.png",
+    enemy_road_cutthroat:"assets/icons/enemy_road_cutthroat.png",
+    enemy_ambush_scout:"assets/icons/enemy_ambush_scout.png",
+    enemy_goblin_warchief:"assets/icons/enemy_goblin_warchief.png",
+    enemy_troll_grunt:"assets/icons/enemy_troll_grunt.png",
+    enemy_hex_shaman:"assets/icons/enemy_hex_shaman.png",
+    enemy_smuggler_captain:"assets/icons/enemy_smuggler_captain.png",
+    enemy_powder_saboteur:"assets/icons/enemy_powder_saboteur.png",
+    enemy_harbor_master:"assets/icons/enemy_harbor_master.png",
+    enemy_fort_commander:"assets/icons/enemy_fort_commander.png",
+    enemy_elite_hussar:"assets/icons/enemy_elite_hussar.png",
+    enemy_war_mage:"assets/icons/enemy_war_mage.png",
+    enemy_powder_dragon:"assets/icons/enemy_powder_dragon.png",
+    enemy_ancient_drake:"assets/icons/enemy_ancient_drake.png",
+    enemy_corrupted_knight:"assets/icons/enemy_corrupted_knight.png",
+    enemy_gate_rat:"assets/icons/enemy_gate_rat.png",
+    enemy_rusted_knight:"assets/icons/enemy_rusted_knight.png",
+    enemy_iron_golem:"assets/icons/enemy_iron_golem.png",
+    enemy_ironwood_guard:"assets/icons/enemy_ironwood_guard.png",
+    enemy_sergeant_major:"assets/icons/enemy_sergeant_major.png",
+    enemy_iron_commander:"assets/icons/enemy_iron_commander.png",
+    enemy_powder_warden:"assets/icons/enemy_powder_warden.png",
+    enemy_blast_captain:"assets/icons/enemy_blast_captain.png",
+    enemy_grand_bomb:"assets/icons/enemy_grand_bomb.png",
+    enemy_drake_sentinel:"assets/icons/enemy_drake_sentinel.png",
+    enemy_dragon_knight:"assets/icons/enemy_dragon_knight.png",
+};
+// Helper: zamienia nazwę wroga/klasy na klucz ICONS (np. "Drunk Brawler" → "enemy_drunk_brawler")
+function enemyIconKey(name) {
+    return "enemy_" + name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+}
+function classIconKey(cls) { return "class_" + cls; }
+// Renderuje pixel-art ikonę; fallback do emoji/tekstu gdy plik jeszcze nie istnieje
+function PixelIcon(_a) {
+    var name = _a.name, _b = _a.size, size = _b === void 0 ? 28 : _b, _c = _a.style, style = _c === void 0 ? {} : _c, fallback = _a.fallback;
+    var src = ICONS[name];
+    if (!src) return React.createElement("span", { style: { fontSize: size * 0.85, lineHeight: 1, display:"inline-block" } }, fallback || name);
+    var outline = "drop-shadow(1px 0 0 rgba(0,0,0,0.95)) drop-shadow(-1px 0 0 rgba(0,0,0,0.95)) drop-shadow(0 1px 0 rgba(0,0,0,0.95)) drop-shadow(0 -1px 0 rgba(0,0,0,0.95))";
+    var glow = "drop-shadow(0 0 6px rgba(200,164,74,0.20))";
+    return React.createElement("img", { src: src, alt: name, style: Object.assign({ width: size, height: size, imageRendering: "pixelated", verticalAlign: "middle", filter: outline + " " + glow }, style) });
+}
+// Duży sprite postaci (walka, karta bohatera) — 56px, z animacją
+function CharSprite(_a) {
+    var iconKey = _a.iconKey, emoji = _a.emoji, size = _a.size || 56, animState = _a.animState, style = _a.style || {};
+    var src = ICONS[iconKey];
+    var anim = animState ? getAnim(_a.side || "hero", animState) : "";
+    var dead = animState === "dead";
+    var baseStyle = Object.assign({ display:"inline-block", animation: anim, filter: dead ? "grayscale(1) brightness(0.4)" : "" }, style);
+    if (src) {
+        var outline = "drop-shadow(1px 0 0 rgba(0,0,0,0.99)) drop-shadow(-1px 0 0 rgba(0,0,0,0.99)) drop-shadow(0 1px 0 rgba(0,0,0,0.99)) drop-shadow(0 -1px 0 rgba(0,0,0,0.99)) drop-shadow(0 0 8px rgba(200,164,74,0.18))";
+        return React.createElement("img", { src: src, alt: iconKey, style: Object.assign({ width: size, height: size, imageRendering: "pixelated" }, baseStyle, { filter: (dead?"grayscale(1) brightness(0.4) ":"") + outline }) });
+    }
+    return React.createElement("span", { style: Object.assign({ fontSize: size * 0.78, lineHeight: 1 }, baseStyle) }, emoji);
+}
 var AN = {
     hero: { attack: "heroAtk 0.44s ease", dodge: "heroDodge 0.5s ease", hit: "shakeX 0.38s ease", crit: "critRecv 0.52s ease", block: "blockH 0.42s ease", dead: "deadH 0.75s ease forwards", idle: "bob 2.2s ease-in-out infinite" },
     enemy: { attack: "enemyAtk 0.44s ease", dodge: "enemyDodge 0.5s ease", hit: "shakeX 0.38s ease", crit: "critRecv 0.52s ease", block: "blockE 0.42s ease", dead: "deadE 0.75s ease forwards", idle: "bob 2.2s ease-in-out infinite" },
@@ -474,20 +701,20 @@ var AN = {
 function getAnim(side, state) { var m = AN[side]; return (m && state && m[state]) || ""; }
 var LC = { miss: "#5a5a6a", dodge: "#3ab4d4", block: "#ccaa20", hit: "#e0b040", crit: "#ff4444", heal: "#44dd88", info: "#c8a44a", win: "#44dd44", lose: "#dd4444" };
 var S = {
-    wrap: { background: "#0d0801", minHeight: "100vh", color: "#c8a44a", fontFamily: "Georgia,serif", maxWidth: 500, margin: "0 auto", position: "relative", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)", paddingBottom: "env(safe-area-inset-bottom)" },
-    hdr: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 13px", background: "#150e04", borderBottom: "2px solid #2e1e08" },
-    mbar: { display: "flex", alignItems: "center", gap: 6, padding: "3px 12px", background: "#100c04", borderBottom: "1px solid #2e1e08" },
+    wrap: { background: "radial-gradient(1200px 700px at 50% -20%, rgba(200,164,74,0.08), transparent 55%), #0d0801", minHeight: "100vh", color: "#c8a44a", fontFamily: "Georgia,serif", maxWidth: 500, margin: "0 auto", position: "relative", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)", paddingBottom: "env(safe-area-inset-bottom)" },
+    hdr: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(180deg,#1a1107,#130c04)", borderBottom: "1px solid rgba(200,164,74,0.22)", boxShadow: "0 10px 24px rgba(0,0,0,0.65)" },
+    mbar: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "linear-gradient(180deg,#130c04,#0f0903)", borderBottom: "1px solid rgba(200,164,74,0.14)" },
     xpWrap: { height: 5, background: "#150e04", position: "relative", borderBottom: "1px solid #2e1e08" },
-    tabs: { display: "flex", background: "#150e04", borderBottom: "2px solid #2e1e08" },
-    tab: { flex: 1, padding: "7px 2px", background: "none", border: "none", color: "#7a6030", cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 15, transition: "all 0.15s" },
-    tabA: { color: "#c8a44a", background: "#0d0801", borderBottom: "2px solid #c8a44a" },
-    body: { padding: "10px 12px 60px" },
-    card: { background: "#150e04", border: "1px solid #2e1e08", borderRadius: 8, padding: 12, marginBottom: 10 },
-    row: { display: "flex", alignItems: "center", gap: 8, background: "#150e04", border: "1px solid #2e1e08", borderRadius: 6, padding: "9px 11px", marginBottom: 7 },
+    tabs: { display: "flex", background: "linear-gradient(180deg,#160e05,#0f0903)", borderBottom: "1px solid rgba(200,164,74,0.14)" },
+    tab: { flex: 1, padding: "10px 2px", background: "none", border: "none", color: "#7a6030", cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 15, transition: "all 0.15s", borderBottom: "2px solid transparent", minHeight: 48 },
+    tabA: { color: "#f0c060", background: "linear-gradient(180deg,#120b03,#0d0801)", borderBottom: "2px solid #c8a44a", textShadow: "0 0 12px rgba(200,164,74,0.18)" },
+    body: { padding: "12px 12px 66px" },
+    card: { background: "linear-gradient(180deg,#160f06,#120b03)", border: "1px solid rgba(200,164,74,0.16)", borderRadius: 12, padding: 12, marginBottom: 10, boxShadow: "0 10px 24px rgba(0,0,0,0.62), inset 0 1px 0 rgba(255,255,255,0.04)" },
+    row: { display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(180deg,#160f06,#110a03)", border: "1px solid rgba(200,164,74,0.14)", borderRadius: 12, padding: "11px 12px", marginBottom: 8, boxShadow: "0 8px 18px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.03)" },
     sec: { fontSize: 12, color: "#7a6030", borderBottom: "1px solid #2e1e08", paddingBottom: 4, marginBottom: 9, letterSpacing: 1, textTransform: "uppercase" },
-    bigBtn: { background: "linear-gradient(180deg,#4a2e08,#2e1e06)", border: "2px solid #c8a44a", color: "#c8a44a", padding: "10px 20px", fontSize: 14, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 6, letterSpacing: 1 },
-    btn: { background: "#1e1206", border: "1px solid #4a3210", color: "#c8a44a", padding: "5px 9px", fontSize: 11, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, whiteSpace: "nowrap" },
-    mBtn: { background: "none", border: "none", color: "#9a7030", cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 13, padding: "2px 5px" },
+    bigBtn: { background: "linear-gradient(180deg,#6a4210,#2a1a07)", border: "2px solid rgba(200,164,74,0.95)", color: "#f0c060", padding: "12px 18px", fontSize: 14, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 12, letterSpacing: 1, boxShadow: "0 12px 22px rgba(0,0,0,0.55), 0 0 18px rgba(200,164,74,0.12), inset 0 1px 0 rgba(255,255,255,0.08)", transition: "filter .15s ease, transform .12s ease", minHeight: 48 },
+    btn: { background: "linear-gradient(180deg,#221408,#160d04)", border: "1px solid rgba(200,164,74,0.22)", color: "#c8a44a", padding: "10px 12px", fontSize: 11, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 10, whiteSpace: "nowrap", boxShadow: "0 8px 16px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.05)", transition: "filter .15s ease, transform .12s ease", minHeight: 48 },
+    mBtn: { background: "linear-gradient(180deg,rgba(200,164,74,0.08),rgba(200,164,74,0.02))", border: "1px solid rgba(200,164,74,0.18)", color: "#9a7030", cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 13, padding: "8px 10px", borderRadius: 10, minHeight: 48 },
     overlay: { position: "fixed", inset: 0, background: "#090601", zIndex: 200, display: "flex", flexDirection: "column", fontFamily: "Georgia,serif", maxWidth: 500, margin: "0 auto", color: "#c8a44a", overflowY: "auto", paddingTop: "env(safe-area-inset-top)", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)", paddingBottom: "env(safe-area-inset-bottom)" },
     inp: { width: "100%", padding: "9px 12px", background: "#150e04", border: "1px solid #3a2a10", color: "#c8a44a", fontFamily: "Georgia,serif", fontSize: 15, borderRadius: 5, boxSizing: "border-box", outline: "none" },
 };
@@ -506,31 +733,63 @@ function HpBar(props) {
 }
 // ── FIGHTER PANEL ─────────────────────────────────────────────────────────────
 function FighterPanel(props) {
-    var side = props.side, name = props.name, emoji = props.emoji, curHp = props.curHp, maxHp = props.maxHp;
+    var side = props.side, name = props.name, emoji = props.emoji, iconKey = props.iconKey, curHp = props.curHp, maxHp = props.maxHp;
     var stats = props.stats, animState = props.animState, floats = props.floats || [], flash = props.flash, reaction = props.reaction;
     var pct = Math.max(0, Math.min(100, curHp / maxHp * 100));
+    var isBoss = props.isBoss;
+    var isHero = side === "hero";
+    // Flash animation on the whole panel
     var fa = flash === "red" ? "flashRed 0.5s ease" : flash === "gold" ? "flashGold 0.5s ease" : flash === "heal" ? "healFlash 0.6s ease" : "";
-    return (React.createElement("div", { style: { flex: 1, background: "#150e04", border: "1px solid #2e1e08", borderRadius: 10, padding: "7px 6px 7px", position: "relative", minWidth: 0, animation: fa, display: "flex", flexDirection: "column", gap: 2 } },
-        floats.filter(function (f) { return f.side === side; }).map(function (f) {
-            return (React.createElement("div", { key: f.id, style: { position: "absolute", left: "50%", top: "18%", color: f.color, fontWeight: "bold", fontSize: f.big ? 18 : 13, animation: "dmgUp 1.1s ease forwards", zIndex: 20, whiteSpace: "nowrap", textShadow: "0 2px 8px #000", pointerEvents: "none", transform: "translateX(-50%)" } }, f.text));
-        }),
-        React.createElement("div", { style: { minHeight: 24, textAlign: "center" } }, reaction && (React.createElement("div", { style: { display: "inline-block", background: "#1e1508", border: "1px solid #c8a44a99", borderRadius: 8, padding: "2px 7px", fontSize: 9, color: "#f0d060", maxWidth: "98%", wordBreak: "break-word", animation: "bubble 2.4s ease forwards", lineHeight: 1.35, position: "relative" } },
-            reaction,
-            React.createElement("div", { style: { position: "absolute", bottom: -5, left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: "4px solid #c8a44a99" } })))),
-        React.createElement("div", { style: { textAlign: "center", height: 56, display: "flex", alignItems: "center", justifyContent: "center" } },
-            React.createElement("div", { style: { fontSize: 46, lineHeight: 1, display: "inline-block", animation: getAnim(side, animState), filter: animState === "dead" ? "grayscale(1) brightness(0.4)" : "" } }, emoji)),
-        React.createElement("div", { style: { textAlign: "center", fontSize: 11, fontWeight: "bold", color: "#d0b060", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 } }, name),
-        React.createElement(HpBar, { pct: pct, height: 10, showText: true, cur: curHp, max: maxHp }),
-        React.createElement("div", { style: { textAlign: "center", fontSize: 9, color: pct < 30 ? "#dd4444" : "#5a4820", marginBottom: 2, letterSpacing: 0.3 } },
-            pct < 30 && "⚠️ ",
-            "HP ",
-            Math.round(pct),
-            "%"),
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 } }, ["str", "agi", "int", "con"].map(function (st) {
+    // Portrait frame colours
+    var frameCol   = isBoss ? "#cc3333" : isHero ? "#c8a44a" : "#5a3a1a";
+    var frameBg    = isBoss ? "linear-gradient(180deg,#1e0606,#100404)"
+                   : isHero ? "linear-gradient(180deg,#120d04,#0d0801)"
+                   :          "linear-gradient(180deg,#0e0c06,#080601)";
+    var innerGlow  = isBoss ? "inset 0 0 22px rgba(200,40,40,0.18)"
+                   : isHero ? "inset 0 0 22px rgba(200,164,74,0.10)"
+                   :          "inset 0 0 18px rgba(0,0,0,0.6)";
+    var bossAnim   = isBoss ? ", bossPulse 2s ease-in-out infinite" : "";
+    return (React.createElement("div", { style: { flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 4 } },
+        // ── Portrait window ───────────────────────────────────────────────────
+        React.createElement("div", { style: {
+            position: "relative",
+            height: 130,
+            borderRadius: 10,
+            border: "2px solid " + frameCol,
+            background: frameBg,
+            boxShadow: innerGlow + ", 0 6px 20px rgba(0,0,0,0.7)",
+            overflow: "hidden",
+            animation: fa + bossAnim,
+            flexShrink: 0
+        } },
+            // corner accents
+            React.createElement("div", { style: { position:"absolute", top: 3, left: 3, width: 10, height: 10, borderTop: "2px solid " + frameCol, borderLeft: "2px solid " + frameCol, borderRadius:"3px 0 0 0", opacity:0.7 } }),
+            React.createElement("div", { style: { position:"absolute", top: 3, right: 3, width: 10, height: 10, borderTop: "2px solid " + frameCol, borderRight: "2px solid " + frameCol, borderRadius:"0 3px 0 0", opacity:0.7 } }),
+            React.createElement("div", { style: { position:"absolute", bottom: 3, left: 3, width: 10, height: 10, borderBottom: "2px solid " + frameCol, borderLeft: "2px solid " + frameCol, borderRadius:"0 0 0 3px", opacity:0.7 } }),
+            React.createElement("div", { style: { position:"absolute", bottom: 3, right: 3, width: 10, height: 10, borderBottom: "2px solid " + frameCol, borderRight: "2px solid " + frameCol, borderRadius:"0 0 3px 0", opacity:0.7 } }),
+            // floor shadow at bottom of portrait
+            React.createElement("div", { style: { position:"absolute", bottom:0, left:0, right:0, height:28, background:"linear-gradient(0deg,rgba(0,0,0,0.65),transparent)", pointerEvents:"none", zIndex:1 } }),
+            // damage / heal floats
+            floats.filter(function (f) { return f.side === side; }).map(function (f) {
+                return React.createElement("div", { key: f.id, style: { position:"absolute", left:"50%", top:"22%", color:f.color, fontWeight:"bold", fontSize: f.big ? 22 : 15, animation:"dmgUp 1.1s ease forwards", zIndex:30, whiteSpace:"nowrap", textShadow:"0 2px 10px #000, 0 0 6px " + f.color, pointerEvents:"none", transform:"translateX(-50%)" } }, f.text);
+            }),
+            // BOSS badge
+            isBoss && React.createElement("div", { style: { position:"absolute", top:5, left:"50%", transform:"translateX(-50%)", background:"#3a0000", border:"1px solid #cc3333", borderRadius:4, fontSize:8, color:"#ff6644", padding:"1px 6px", letterSpacing:1, zIndex:10, whiteSpace:"nowrap" } }, "⚠ BOSS"),
+            // reaction bubble — overlays portrait
+            reaction && React.createElement("div", { style: { position:"absolute", top:5, left:"50%", transform:"translateX(-50%)", background:"rgba(20,12,2,0.92)", border:"1px solid #c8a44a88", borderRadius:8, padding:"3px 8px", fontSize:9, color:"#f0d060", maxWidth:"90%", wordBreak:"break-word", animation:"bubble 2.4s ease forwards", lineHeight:1.35, zIndex:25, whiteSpace:"nowrap", textOverflow:"ellipsis", overflow:"hidden" } }, reaction),
+            // ── SPRITE ────────────────────────────────────────────────────────
+            React.createElement("div", { style: { position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" } },
+                React.createElement(CharSprite, { iconKey: iconKey, emoji: emoji, size: 96, animState: animState, side: side }))),
+        // ── Name strip ────────────────────────────────────────────────────────
+        React.createElement("div", { style: { textAlign:"center", fontSize:11, fontWeight:"bold", color: isBoss ? "#ff9966" : isHero ? "#f0d080" : "#c8a44a", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", letterSpacing:0.3 } }, name),
+        // ── HP bar ────────────────────────────────────────────────────────────
+        React.createElement(HpBar, { pct: pct, height: 11, showText: true, cur: curHp, max: maxHp }),
+        // ── Compact stat row ─────────────────────────────────────────────────
+        React.createElement("div", { style: { display:"flex", gap:2 } }, ["str","agi","int","con"].map(function(st) {
             var sc = STAT_COLOR[st];
-            return (React.createElement("div", { key: st, style: { background: "#0d0801", border: "1px solid " + sc + "25", borderRadius: 4, padding: "2px 3px", textAlign: "center" } },
-                React.createElement("div", { style: { fontSize: 8, color: sc + "88" } }, STAT_LABEL[st]),
-                React.createElement("div", { style: { fontSize: 12, fontWeight: "bold", color: sc } }, stats[st] || 0)));
+            return React.createElement("div", { key:st, style:{ flex:1, background:"#0d0801", border:"1px solid "+sc+"22", borderRadius:4, padding:"2px 1px", textAlign:"center" } },
+                React.createElement(PixelIcon, { name:st, size:14 }),
+                React.createElement("div", { style:{ fontSize:10, fontWeight:"bold", color:sc, lineHeight:1.1 } }, stats[st]||0));
         }))));
 }
 // ── TRAVEL SCREEN ─────────────────────────────────────────────────────────────
@@ -551,7 +810,9 @@ function TravelScreen(props) {
             ts.data.dungeon.lootTable,
             " loot awaits ",
             "★"),
-        React.createElement("div", { style: { fontSize: 36, margin: "10px 0" } }, enemy.emoji),
+        React.createElement("div", { style: { display:"flex", justifyContent:"center", margin: "12px 0 6px" } },
+            React.createElement("div", { style: { width:64, height:64, background:"#150e04", borderRadius:12, border:"1px solid #3e2808", display:"flex", alignItems:"center", justifyContent:"center", animation:"bob 2.2s ease-in-out infinite" } },
+                React.createElement(PixelIcon, { name: enemyIconKey(enemy.name), size: 50, fallback: enemy.emoji }))),
         React.createElement("div", { style: { fontSize: 13, color: "#9a7030", marginBottom: 14 } },
             React.createElement("strong", null, enemy.name),
             " guards the way"),
@@ -796,15 +1057,25 @@ function CombatScreen(props) {
                     round + 1),
                 React.createElement("div", { style: { fontSize: 13, fontWeight: "bold", color: "#c8a44a", flex: 1, textAlign: "center" } }, questName),
                 React.createElement("div", { style: { fontSize: 10, color: auto ? "#f0c060" : "#4a3820", minWidth: 28, textAlign: "right" } }, auto ? "AUTO" : ""))),
-        React.createElement("div", { style: { display: "flex", alignItems: "stretch", padding: "8px 10px 4px", gap: 8, flexShrink: 0 } },
-            React.createElement(FighterPanel, { side: "hero", name: hero.name, emoji: CLASSES[hero.class].emoji, curHp: hp.h, maxHp: heroMaxHp, stats: totalStats, animState: anim.hero, floats: floats, flash: pf.hero, reaction: reactions.hero }),
-            React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", width: 24, flexShrink: 0 } },
-                React.createElement("span", { style: { fontSize: 13, fontWeight: "bold", animation: "vsGlow 2.5s ease-in-out infinite", color: "#9a7020" } }, "VS")),
-            React.createElement(FighterPanel, { side: "enemy", name: enemy.name, emoji: enemy.emoji, curHp: hp.e, maxHp: initEHp.current, stats: enemy.stats, animState: anim.enemy, floats: floats, flash: pf.enemy, reaction: reactions.enemy })),
+        React.createElement("div", { style: { display: "flex", alignItems: "flex-start", padding: "8px 10px 6px", gap: 8, flexShrink: 0 } },
+            React.createElement(FighterPanel, { side: "hero", name: hero.name, emoji: CLASSES[hero.class].emoji, iconKey: classIconKey(hero.class), curHp: hp.h, maxHp: heroMaxHp, stats: totalStats, animState: anim.hero, floats: floats, flash: pf.hero, reaction: reactions.hero }),
+            React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: 22, flexShrink: 0, paddingTop: 44 } },
+                React.createElement("span", { style: { fontSize: 12, fontWeight: "bold", animation: "vsGlow 2.5s ease-in-out infinite", color: "#9a7020", letterSpacing: 1 } }, "VS")),
+            React.createElement(FighterPanel, { side: "enemy", name: enemy.name, emoji: enemy.emoji, iconKey: enemyIconKey(enemy.name), isBoss: enemy.boss, curHp: hp.e, maxHp: initEHp.current, stats: enemy.stats, animState: anim.enemy, floats: floats, flash: pf.enemy, reaction: reactions.enemy })),
         React.createElement("div", { style: { margin: "0 10px 5px", background: "#150e04", border: "1px solid #2e1e08", borderRadius: 5, padding: "4px 8px", flexShrink: 0 } },
             React.createElement("div", { style: { display: "flex", justifyContent: "space-between", fontSize: 10, gap: 3 } }, [["Traf", hitPct + "%", "#c8a44a"], ["Kryt", critPct + "%", "#ff9944"], ["Unik", dodgePct + "%", "#44bbdd"], ["Blok", blockPct + "%", "#ddbb22"]].map(function (it) { return React.createElement("div", { key: it[0], style: { textAlign: "center", flex: 1, background: "#0d0801", borderRadius: 3, padding: "3px 0" } },
                 React.createElement("div", { style: { color: "#5a4820", fontSize: 8 } }, it[0]),
-                React.createElement("div", { style: { color: it[2], fontWeight: "bold" } }, it[1])); }))),
+                React.createElement("div", { style: { color: it[2], fontWeight: "bold" } }, it[1])); })),
+            (function() {
+                var prefType  = CLASSES[hero.class] && CLASSES[hero.class].preferredType;
+                var weapDmg   = totalStats._weaponDmgType;
+                var active    = prefType && weapDmg && prefType === weapDmg;
+                var col       = active ? DMG_TYPE_COLOR[weapDmg] : "#3a2808";
+                var label     = active
+                    ? DMG_TYPE_LABEL[weapDmg] + " +20% DMG ✓"
+                    : (prefType ? ("Equip " + DMG_TYPE_LABEL[prefType] + " for +20% DMG") : "");
+                return React.createElement("div", { style: { marginTop: 3, textAlign: "center", fontSize: 8, color: col, borderTop: "1px solid #1e1208", paddingTop: 2, letterSpacing: 0.3 } }, label);
+            })()),
         React.createElement("div", { style: { padding: "0 10px 5px", display: "flex", gap: 5, flexShrink: 0, flexWrap: "wrap" } }, !outcome ? (React.createElement(React.Fragment, null,
             React.createElement("button", { onClick: doRound, disabled: busy || auto, style: { flex: 3, textAlign: "center", fontSize: 14, padding: "10px 4px", opacity: (busy || auto) ? 0.4 : 1, background: "linear-gradient(180deg,#5a3a10,#3a2208)", border: "2px solid #c8a44a", color: "#f0c060", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 6, fontWeight: "bold", boxShadow: (busy || auto) ? "none" : "0 0 8px rgba(200,164,74,0.22)" } }, "\u2694\uFE0F Atak"),
             potions.small > 0 && React.createElement("button", { onClick: function () { doHeal("small", 30); }, disabled: busy, style: { flex: 2, padding: "7px 3px", background: "#0a1e0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 5, fontSize: 10, textAlign: "center" } },
@@ -891,7 +1162,9 @@ function DungeonBetween(props) {
                     ")"))),
         React.createElement("div", { style: { background: "#1a0e04", border: "1px solid " + (section.boss ? "#cc4444" : "#3e2808"), borderRadius: 8, padding: 10, marginBottom: 14, width: "100%", maxWidth: 290, boxSizing: "border-box", animation: section.boss ? "bossPulse 1.4s ease-in-out infinite" : "" } },
             React.createElement("div", { style: { fontSize: 11, color: section.boss ? "#cc4444" : "#7a6030", marginBottom: 3 } }, section.boss ? "⚠️ BOSS FIGHT" : "NEXT SECTION"),
-            React.createElement("div", { style: { fontSize: 20, marginBottom: 3 } }, section.enemy.emoji),
+            React.createElement("div", { style: { display:"flex", justifyContent:"center", margin:"4px 0 6px" } },
+                React.createElement("div", { style: { width:40, height:40, background:"#0d0801", borderRadius:7, border:"1px solid "+(section.boss?"#cc4444":"#3e2808"), display:"flex", alignItems:"center", justifyContent:"center" } },
+                    React.createElement(PixelIcon, { name: enemyIconKey(section.enemy.name), size: 32, fallback: section.enemy.emoji }))),
             React.createElement("div", { style: { fontWeight: "bold", fontSize: 13 } },
                 section.name,
                 ": ",
@@ -916,10 +1189,12 @@ function DungeonReward(props) {
             " ",
             dr.dungeon.name),
         React.createElement("div", { style: { background: "#150e04", border: "2px solid " + RARITY_COLOR[rarity], borderRadius: 10, padding: 14, marginBottom: 12, maxWidth: 270, width: "100%", boxSizing: "border-box", animation: rarAnim, boxShadow: RARITY_GLOW[rarity] } },
-            React.createElement("div", { style: { fontSize: 10, color: RARITY_COLOR[rarity], textTransform: "uppercase", letterSpacing: 2, marginBottom: 4 } },
+            React.createElement("div", { style: { fontSize: 10, color: RARITY_COLOR[rarity], textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 } },
                 rarity,
                 " item"),
-            React.createElement("div", { style: { fontSize: 22, marginBottom: 4 } }, SLOT_EMOJI[dr.loot.slot]),
+            React.createElement("div", { style: { display:"flex", justifyContent:"center", marginBottom: 8 } },
+                React.createElement("div", { style: { width:52, height:52, background:"#0d0801", borderRadius:10, border:"2px solid "+RARITY_COLOR[rarity], boxShadow: RARITY_GLOW[rarity], display:"flex", alignItems:"center", justifyContent:"center" } },
+                    React.createElement(PixelIcon, { name: dr.loot.id, size: 38, fallback: SLOT_EMOJI[dr.loot.slot] }))),
             React.createElement("div", { style: { fontSize: 14, fontWeight: "bold", color: RARITY_COLOR[rarity], marginBottom: 3 } }, dr.loot.name),
             React.createElement("div", { style: { fontSize: 11, color: "#7a6030", marginBottom: 4 } }, dr.loot.desc),
             React.createElement("div", { style: { fontSize: 11, color: "#c8a44a" } }, Object.keys(dr.loot.stats).map(function (k) { return "+" + dr.loot.stats[k] + " " + k.toUpperCase(); }).join(" · "))),
@@ -1030,7 +1305,8 @@ function CharacterSelectScreen(props) {
                         "\uD83D\uDDD1\uFE0F ",
                         T("Usuń", "Delete")),
                     React.createElement("button", { onClick: function () { setConfirmDel(null); }, style: { padding: "6px 16px", background: "#1e1206", border: "1px solid #4a3210", color: "#c8a44a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 12 } }, T("Anuluj", "Cancel"))))) : hasHero ? (React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } },
-                React.createElement("div", { style: { fontSize: 32 } }, CLASSES[s.hero.class].emoji),
+                React.createElement("div", { style: { width:40, height:40, flexShrink:0, background:"#0d0801", borderRadius:8, border:"1px solid #3e2808", display:"flex", alignItems:"center", justifyContent:"center" } },
+                    React.createElement(CharSprite, { iconKey: classIconKey(s.hero.class), emoji: CLASSES[s.hero.class].emoji, size: 34 })),
                 React.createElement("div", { style: { flex: 1, textAlign: "left" } },
                     React.createElement("div", { style: { fontWeight: "bold", fontSize: 14 } }, s.hero.name),
                     React.createElement("div", { style: { fontSize: 10, color: "#7a6030" } },
@@ -1071,33 +1347,62 @@ function CreateScreen(props) {
     var _c = useState(null);
     var cls = _c[0];
     var setCls = _c[1];
-    return (React.createElement("div", { style: { width: "100%", minHeight: "100vh", background: "#0d0801", display: "flex", justifyContent: "center", alignItems: "flex-start" } },
+    var _hov = useState(null);
+    var hovCls = _hov[0];
+    var setHovCls = _hov[1];
+    // Stat bar component for class card
+    function StatBar(sbp) {
+        var val = sbp.val, max = sbp.max || 12, col = sbp.col;
+        return React.createElement("div", { style: { display:"flex", alignItems:"center", gap: 5, marginBottom: 2 } },
+            React.createElement(PixelIcon, { name: sbp.stat, size: 14, fallback: sbp.stat.toUpperCase() }),
+            React.createElement("div", { style: { flex: 1, background: "#0a0601", borderRadius: 2, overflow:"hidden", height: 5, border: "1px solid rgba(255,255,255,0.06)" } },
+                React.createElement("div", { style: { width: Math.min(100, Math.round(val / max * 100)) + "%", height:"100%", background: col, borderRadius: 2, transition: "width 0.3s" } })),
+            React.createElement("span", { style: { fontSize: 10, color: col, minWidth: 14, textAlign:"right", fontWeight:"bold" } }, val));
+    }
+    return (React.createElement("div", { style: { width: "100%", minHeight: "100vh", background: "radial-gradient(800px 600px at 50% -10%, rgba(200,164,74,0.07), transparent 55%), #0d0801", display: "flex", justifyContent: "center", alignItems: "flex-start" } },
         React.createElement("div", { style: { color: "#c8a44a", fontFamily: "Georgia,serif", padding: 16, maxWidth: 500, width: "100%", boxSizing: "border-box" } },
             React.createElement("style", null, ANIM_CSS),
-            React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 16 } },
+            React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 20 } },
                 React.createElement("button", { onClick: props.onBack, style: { background: "none", border: "none", color: "#7a6030", cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 22, padding: "0 4px" } }, "\u2190"),
                 React.createElement("h2", { style: { textAlign: "center", letterSpacing: 2, margin: 0, flex: 1, fontSize: 18 } },
-                    "\u2694\uFE0F ",
-                    T("STWÓRZ BOHATERA", "FORGE YOUR HERO"),
+                    T("WYKUĆ BOHATERA", "FORGE YOUR HERO"),
                     " #",
                     props.slot + 1)),
-            React.createElement("div", { style: { marginBottom: 14 } },
+            React.createElement("div", { style: { marginBottom: 18 } },
                 React.createElement("div", { style: { color: "#7a6030", fontSize: 11, marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, T("Imię Bohatera", "Hero Name")),
                 React.createElement("input", { value: name, onChange: function (e) { setName(e.target.value); }, placeholder: T("Wpisz imię...", "Enter name..."), style: S.inp })),
-            React.createElement("div", { style: { color: "#7a6030", fontSize: 11, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 } }, T("Wybierz Klasę", "Choose Class")),
-            React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 18 } }, Object.keys(CLASSES).map(function (k) { var c = CLASSES[k]; return React.createElement("div", { key: k, onClick: function () { setCls(k); }, style: { padding: 11, background: cls === k ? "#1e1508" : "#150e04", border: "2px solid " + (cls === k ? "#c8a44a" : "#2e1e08"), borderRadius: 8, cursor: "pointer" } },
-                React.createElement("div", { style: { fontSize: 17, marginBottom: 2 } },
-                    c.emoji,
-                    " ",
-                    React.createElement("strong", null, c.name)),
-                React.createElement("div", { style: { color: "#7a6030", fontSize: 11, marginBottom: 4 } }, c.desc),
-                React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", fontSize: 11 } }, Object.keys(c.stats).map(function (s) { return React.createElement("span", { key: s, style: { color: STAT_COLOR[s] || "#c8a44a" } },
-                    "\u25AA ",
-                    s.toUpperCase(),
-                    " ",
-                    c.stats[s]); }))); })),
-            React.createElement("button", { onClick: function () { if (name.trim() && cls)
-                    props.onCreate(name.trim(), cls); }, style: Object.assign({}, S.bigBtn, { width: "100%", opacity: name.trim() && cls ? 1 : 0.4 }) },
+            React.createElement("div", { style: { color: "#7a6030", fontSize: 11, marginBottom: 10, textTransform: "uppercase", letterSpacing: 1 } }, T("Wybierz Klasę", "Choose Class")),
+            React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 } }, Object.keys(CLASSES).map(function (k) {
+                var c = CLASSES[k];
+                var isSelected = cls === k;
+                var isHovered = hovCls === k;
+                var highlight = isSelected || isHovered;
+                return React.createElement("div", { key: k,
+                    onClick: function () { setCls(k); },
+                    onMouseEnter: function () { setHovCls(k); },
+                    onMouseLeave: function () { setHovCls(null); },
+                    style: {
+                        display: "flex", gap: 12, alignItems: "flex-start",
+                        padding: 14,
+                        background: isSelected ? "linear-gradient(180deg,#1e1508,#160e04)" : "linear-gradient(180deg,#160e04,#100902)",
+                        border: "2px solid " + (isSelected ? "#c8a44a" : highlight ? "#5a3a10" : "#2e1e08"),
+                        borderRadius: 12, cursor: "pointer",
+                        boxShadow: isSelected ? "0 0 18px rgba(200,164,74,0.16), inset 0 1px 0 rgba(255,255,255,0.05)" : "0 4px 12px rgba(0,0,0,0.5)",
+                        transition: "border-color 0.15s, box-shadow 0.15s"
+                    } },
+                    React.createElement("div", { style: { flexShrink: 0, width: 64, height: 64, background: "#0d0801", borderRadius: 10, border: "1px solid " + (isSelected ? "#c8a44a55" : "#2e1e0888"), display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" } },
+                        React.createElement(CharSprite, { iconKey: classIconKey(k), emoji: c.emoji, size: 52 })),
+                    React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+                        React.createElement("div", { style: { display:"flex", alignItems:"center", gap: 8, marginBottom: 3 } },
+                            React.createElement("strong", { style: { fontSize: 15, color: isSelected ? "#f0c060" : "#c8a44a" } }, c.name),
+                            isSelected && React.createElement("span", { style: { fontSize: 9, color: "#f0c060", background:"#3a2a00", border:"1px solid #c8a44a55", borderRadius: 8, padding:"1px 6px", letterSpacing:0.5 } }, T("WYBRANO", "SELECTED"))),
+                        React.createElement("div", { style: { color: "#7a6030", fontSize: 11, marginBottom: 8, lineHeight: 1.4 } }, c.desc),
+                        Object.keys(c.stats).map(function (s) {
+                            return React.createElement(StatBar, { key: s, stat: s, val: c.stats[s], max: 12, col: STAT_COLOR[s] || "#c8a44a" });
+                        })));
+            })),
+            React.createElement("button", { onClick: function () { if (name.trim() && cls) props.onCreate(name.trim(), cls); },
+                style: Object.assign({}, S.bigBtn, { width: "100%", opacity: name.trim() && cls ? 1 : 0.4 }) },
                 "\u2694\uFE0F ",
                 T("Na pole walki!", "Enter the Field!")))));
 }
@@ -1110,10 +1415,44 @@ function HeroTab(props) {
     var _hov = useState(null);
     var hovPerk = _hov[0];
     var setHovPerk = _hov[1];
+    // Stat tooltips (hover on desktop, tap on mobile; auto-hide after 4s)
+    var _st = useState(null);
+    var hovStat = _st[0];
+    var setHovStat = _st[1];
+    var statTipTimer = useRef(null);
+    function statTipText(st) {
+        if (st === "str")
+            return "⚔️ STR (Siła): Zwiększa obrażenia zadawane bronią białą oraz siłę blokowania ataków.";
+        if (st === "agi")
+            return "🏃 AGI (Zręczność): Zwiększa szansę na trafienie, unik i inicjatywę w walce.";
+        if (st === "int")
+            return "🧠 INT (Inteligencja): Zwiększa obrażenia od prochu, granatów i alchemii oraz szansę na trafienie krytyczne.";
+        if (st === "con")
+            return "❤️ CON (Wytrzymałość): Zwiększa maksymalne punkty życia oraz ogólną odporność na obrażenia.";
+        return "";
+    }
+    function statAbbr(st) {
+        if (st === "str")
+            return "STR";
+        if (st === "agi")
+            return "AGI";
+        if (st === "int")
+            return "INT";
+        if (st === "con")
+            return "CON";
+        return st.toUpperCase();
+    }
+    function toggleStatTip(st) {
+        clearTimeout(statTipTimer.current);
+        setHovStat(function (cur) { return cur === st ? null : st; });
+        statTipTimer.current = setTimeout(function () { setHovStat(null); }, 4000);
+    }
+    useEffect(function () { return function () { clearTimeout(statTipTimer.current); }; }, []);
     return (React.createElement("div", null,
         React.createElement("div", { style: S.card },
             React.createElement("div", { style: { textAlign: "center", marginBottom: 10 } },
-                React.createElement("div", { style: { fontSize: 52, filter: "drop-shadow(0 2px 8px rgba(200,164,74,0.28))" } }, CLASSES[hero.class].emoji),
+                React.createElement("div", { style: { marginBottom: 6, display: "flex", justifyContent: "center" } },
+                    React.createElement(CharSprite, { iconKey: classIconKey(hero.class), emoji: CLASSES[hero.class].emoji, size: 72 })),
                 React.createElement("div", { style: { fontSize: 17, fontWeight: "bold" } }, hero.name),
                 React.createElement("div", { style: { color: "#7a6030", fontSize: 11, marginBottom: 8 } },
                     CLASSES[hero.class].name,
@@ -1160,9 +1499,21 @@ function HeroTab(props) {
                     React.createElement("button", { onClick: onInstantHeal, style: { padding: "4px 9px", background: "#1e1a06", border: "1px solid #aa7000", color: "#ffaa00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } }, "\u26A1 Full Heal [\u03B1]"))),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } }, ["str", "agi", "int", "con"].map(function (st) {
                 var sc = STAT_COLOR[st];
-                return (React.createElement("div", { key: st, style: { background: "#0d0801", border: "1px solid " + sc + "33", borderRadius: 7, padding: "7px 5px", textAlign: "center", boxShadow: "inset 0 0 10px " + sc + "09" } },
-                    React.createElement("div", { style: { color: sc + "aa", fontSize: 10, letterSpacing: 0.3 } }, STAT_LABEL[st]),
-                    React.createElement("div", { style: { fontSize: 20, fontWeight: "bold", color: sc, textShadow: "0 0 8px " + sc + "44" } }, stats[st] || 0)));
+                var isH = hovStat === st;
+                return (React.createElement("div", { key: st, style: { position: "relative" }, onMouseEnter: function () { setHovStat(st); }, onMouseLeave: function () { setHovStat(null); }, onTouchStart: function (e) { e.preventDefault(); toggleStatTip(st); } },
+                    React.createElement("div", { style: { background: "linear-gradient(180deg,#0f0a02,#0b0701)", border: "1px solid " + (isH ? "#c8a44a" : sc + "33"), borderRadius: 10, padding: "10px 8px", textAlign: "center", boxShadow: isH ? "0 10px 22px rgba(0,0,0,0.65), 0 0 16px rgba(200,164,74,0.16), inset 0 0 14px " + sc + "10" : "0 8px 18px rgba(0,0,0,0.55), inset 0 0 12px " + sc + "0a", transition: "transform .12s ease, box-shadow .12s ease, border-color .12s ease", cursor: "help", userSelect: "none" } },
+                        React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center", justifyContent: "center", color: isH ? "#f0c060" : sc + "aa", fontSize: 10, letterSpacing: 0.45, textTransform: "uppercase" } },
+                            // PIXEL ART ICONS
+                            React.createElement(PixelIcon, { name: st, size: 24 }),
+                            React.createElement("span", null, statAbbr(st))),
+                        React.createElement("div", { style: { fontSize: 22, fontWeight: "bold", color: sc, textShadow: "0 0 10px " + sc + "44" } }, stats[st] || 0),
+                        React.createElement("div", { style: { height: 6 } })),
+                    isH && React.createElement("div", { className: "ps-tip" },
+                        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: "#f0c060", fontWeight: "bold", marginBottom: 4, letterSpacing: 0.3 } },
+                            // PIXEL ART ICONS
+                            React.createElement(PixelIcon, { name: st, size: 20 }),
+                            React.createElement("span", null, statAbbr(st))),
+                        React.createElement("div", { style: { fontSize: 10.5, color: "#c8a44a", lineHeight: 1.35 } }, statTipText(st)))));
             })),
             (potions.small > 0 || potions.medium > 0 || potions.large > 0) && React.createElement("div", { style: { marginTop: 7, background: "#0d0801", border: "1px solid #2e1e08", borderRadius: 5, padding: "5px 8px", display: "flex", gap: 10, justifyContent: "center" } },
                 potions.small > 0 && React.createElement("span", { style: { fontSize: 11, color: "#44dd88" } },
@@ -1197,7 +1548,8 @@ function HeroTab(props) {
             }))),
         React.createElement("div", { style: S.sec }, "\uD83C\uDFBD Ekwipunek"),
         Object.keys(SLOT_EMOJI).map(function (slot) { var it = equipped[slot]; return React.createElement("div", { key: slot, style: Object.assign({}, S.row, { opacity: it ? 1 : 0.45 }) },
-            React.createElement("span", { style: { fontSize: 20, width: 26, textAlign: "center" } }, SLOT_EMOJI[slot]),
+            // PIXEL ART ICONS
+            React.createElement(PixelIcon, { name: slot, size: 24, style: it ? {} : { opacity: 0.45, filter: "grayscale(1) brightness(0.85) drop-shadow(0 1px 2px rgba(0,0,0,0.6))" } }),
             React.createElement("div", { style: { flex: 1, minWidth: 0 } },
                 React.createElement("div", { style: { fontWeight: "bold", fontSize: 12, color: it && it.rarity ? RARITY_COLOR[it.rarity] : "#c8a44a" } }, it ? it.name : "Empty " + slot),
                 it && React.createElement("div", { style: { color: "#7a6030", fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, it.desc),
@@ -1231,8 +1583,9 @@ function QuestsTab(props) {
                                 "\u26A1 ",
                                 cost)),
                         React.createElement("div", { style: { color: "#7a6030", fontSize: 10, margin: "2px 0 3px" } }, q.desc),
-                        React.createElement("div", { style: { display: "flex", gap: 5, alignItems: "center", marginBottom: 3 } },
-                            React.createElement("span", { style: { fontSize: 14 } }, en.emoji),
+                        React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center", marginBottom: 3 } },
+                            React.createElement("div", { style: { width:28, height:28, background:"#0d0801", borderRadius:5, border:"1px solid #2e1e08", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 } },
+                                React.createElement(PixelIcon, { name: enemyIconKey(en.name), size: 22, fallback: en.emoji })),
                             React.createElement("span", { style: { fontSize: 10, color: "#9a7030" } },
                                 React.createElement("strong", null, en.name),
                                 " \u00B7 HP ",
@@ -1322,21 +1675,27 @@ function InventoryTab(props) {
             "\uD83C\uDF92 Items (",
             inventory.length,
             ")"),
-        inventory.map(function (it) { var col = it.rarity ? RARITY_COLOR[it.rarity] : TIER_COLOR[it.tier] || "#c8a44a"; var tLabel = it.rarity ? it.rarity.toUpperCase() : ("★".repeat(it.tier || 1)); return React.createElement("div", { key: it.uid, style: Object.assign({}, S.row, { boxShadow: it.rarity ? RARITY_GLOW[it.rarity] : "none" }) },
-            React.createElement("span", { style: { fontSize: 20, width: 24, textAlign: "center" } }, SLOT_EMOJI[it.slot]),
-            React.createElement("div", { style: { flex: 1, minWidth: 0 } },
-                React.createElement("div", { style: { fontWeight: "bold", fontSize: 12, color: col } },
-                    it.name,
-                    " ",
-                    React.createElement("span", { style: { fontSize: 9 } }, tLabel)),
-                React.createElement("div", { style: { color: "#7a6030", fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, it.desc),
-                React.createElement("div", { style: { fontSize: 10, color: col, marginTop: 1 } }, Object.keys(it.stats).map(function (s) { return "+" + it.stats[s] + " " + s.toUpperCase(); }).join(" · "))),
-            React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 3, flexShrink: 0 } },
-                React.createElement("button", { onClick: function () { onEquip(it); }, style: S.btn }, "Equip"),
-                React.createElement("button", { onClick: function () { SFX.sell(); onSell(it); }, style: Object.assign({}, S.btn, { color: "#f0c060", borderColor: "#5a4810" }) },
-                    "\uD83D\uDCB0 ",
-                    getSellPrice(it),
-                    "g"))); })));
+        inventory.map(function (it) {
+            var col = it.rarity ? RARITY_COLOR[it.rarity] : TIER_COLOR[it.tier] || "#c8a44a";
+            var tLabel = it.rarity ? it.rarity.toUpperCase() : ("★".repeat(it.tier || 1));
+            var leftBorder = it.rarity ? RARITY_COLOR[it.rarity] : (TIER_COLOR[it.tier] || "#4a3a1a");
+            return React.createElement("div", { key: it.uid, style: Object.assign({}, S.row, { boxShadow: it.rarity ? RARITY_GLOW[it.rarity] : "none", borderLeft: "3px solid " + leftBorder }) },
+                React.createElement("div", { style: { width: 36, height: 36, flexShrink: 0, display:"flex", alignItems:"center", justifyContent:"center", background:"#0d0801", borderRadius:6, border:"1px solid " + leftBorder + "66" } },
+                    React.createElement(PixelIcon, { name: it.id, size: 26, fallback: SLOT_EMOJI[it.slot] })),
+                React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+                    React.createElement("div", { style: { fontWeight: "bold", fontSize: 12, color: col } },
+                        it.name,
+                        " ",
+                        React.createElement("span", { style: { fontSize: 9 } }, tLabel)),
+                    React.createElement("div", { style: { color: "#7a6030", fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, it.desc),
+                    ItemBadges(it),
+                    React.createElement("div", { style: { fontSize: 10, color: col, marginTop: 1 } }, Object.keys(it.stats).map(function (s) { return "+" + it.stats[s] + " " + s.toUpperCase(); }).join(" · "))),
+                React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 3, flexShrink: 0 } },
+                    React.createElement("button", { onClick: function () { onEquip(it); }, style: S.btn }, "Equip"),
+                    React.createElement("button", { onClick: function () { SFX.sell(); onSell(it); }, style: Object.assign({}, S.btn, { color: "#f0c060", borderColor: "#5a4810" }) },
+                        "\uD83D\uDCB0 ",
+                        getSellPrice(it),
+                        "g"))); })));
 }
 // ── SHOP TAB ──────────────────────────────────────────────────────────────────
 function ShopTab(props) {
@@ -1387,7 +1746,8 @@ function ShopTab(props) {
                 "\u2605 Rzadka Oferta \u2014 ",
                 shopSpecial.rarity),
             React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
-                React.createElement("span", { style: { fontSize: 20 } }, SLOT_EMOJI[shopSpecial.slot]),
+                React.createElement("div", { style: { width:36, height:36, display:"flex", alignItems:"center", justifyContent:"center", background:"#0d0801", borderRadius:6, border:"2px solid " + RARITY_COLOR[shopSpecial.rarity], boxShadow: RARITY_GLOW[shopSpecial.rarity] } },
+                    React.createElement(PixelIcon, { name: shopSpecial.id, size: 28, fallback: SLOT_EMOJI[shopSpecial.slot] })),
                 React.createElement("div", { style: { flex: 1, minWidth: 0 } },
                     React.createElement("div", { style: { fontWeight: "bold", fontSize: 12, color: RARITY_COLOR[shopSpecial.rarity] } }, shopSpecial.name),
                     React.createElement("div", { style: { color: "#7a6030", fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, shopSpecial.desc),
@@ -1402,40 +1762,44 @@ function ShopTab(props) {
                             setShopSpecial(null);
                         } }, disabled: gold < shopSpecial.shopPrice, style: Object.assign({}, S.btn, { borderColor: RARITY_COLOR[shopSpecial.rarity], color: RARITY_COLOR[shopSpecial.rarity], opacity: gold >= shopSpecial.shopPrice ? 1 : 0.35 }) }, "Kup")))),
         React.createElement("div", { style: S.sec }, "\uD83D\uDED2 Equipment"),
-        React.createElement("div", { style: { display: "flex", gap: 4, marginBottom: 9, flexWrap: "wrap" } }, slots.map(function (s) { return React.createElement("button", { key: s, onClick: function () { setFilter(s); }, style: { background: filter === s ? "#2e1e08" : "#150e04", border: "1px solid " + (filter === s ? "#c8a44a" : "#4a3210"), color: "#c8a44a", padding: "4px 7px", fontSize: 10, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4 } }, s === "all" ? "📦 All" : SLOT_EMOJI[s] + " " + s); })),
-        filtered.map(function (it) { var ok = gold >= it.price; return React.createElement("div", { key: it.id, style: Object.assign({}, S.row, { opacity: ok ? 1 : 0.55 }) },
-            React.createElement("span", { style: { fontSize: 20, width: 24, textAlign: "center" } }, SLOT_EMOJI[it.slot]),
-            React.createElement("div", { style: { flex: 1, minWidth: 0 } },
-                React.createElement("div", { style: { fontWeight: "bold", fontSize: 12 } },
-                    it.name,
-                    " ",
-                    React.createElement("span", { style: { fontSize: 9, color: TIER_COLOR[it.tier] || "#9a7a30" } }, it.tier ? ("★".repeat(it.tier)) : "")),
-                React.createElement("div", { style: { color: "#7a6030", fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, it.desc),
-                React.createElement("div", { style: { fontSize: 10, color: "#c8a44a", marginTop: 1 } }, Object.keys(it.stats).map(function (s) { return "+" + it.stats[s] + " " + s.toUpperCase(); }).join(" · "))),
-            React.createElement("div", { style: { textAlign: "right", flexShrink: 0 } },
-                React.createElement("div", { style: { fontSize: 11, color: "#f0c060", marginBottom: 3 } },
-                    "\uD83D\uDCB0 ",
-                    it.price),
-                React.createElement("button", { onClick: function () { if (ok) {
-                        SFX.buy();
-                        onBuy(it);
-                    } }, disabled: !ok, style: Object.assign({}, S.btn, { opacity: ok ? 1 : 0.35 }) }, "Buy"))); }),
+        React.createElement("div", { style: { display: "flex", gap: 4, marginBottom: 9, flexWrap: "wrap" } }, slots.map(function (s) { return React.createElement("button", { key: s, onClick: function () { setFilter(s); }, style: { background: filter === s ? "#2e1e08" : "#150e04", border: "1px solid " + (filter === s ? "#c8a44a" : "#4a3210"), color: "#c8a44a", padding: "4px 7px", fontSize: 10, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, display:"flex", alignItems:"center", gap: 4 } },
+            s === "all" ? "📦 All" : React.createElement(React.Fragment, null, React.createElement(PixelIcon, { name: s, size: 16, fallback: SLOT_EMOJI[s] }), " ", s)); })),
+        filtered.map(function (it) {
+            var ok = gold >= it.price;
+            var tierBorder = it.tier ? TIER_COLOR[it.tier] : "#2e1e08";
+            return React.createElement("div", { key: it.id, style: Object.assign({}, S.row, { opacity: ok ? 1 : 0.55, borderLeft: "3px solid " + tierBorder }) },
+                React.createElement("div", { style: { width: 34, height: 34, flexShrink: 0, display:"flex", alignItems:"center", justifyContent:"center", background:"#0d0801", borderRadius:6, border:"1px solid rgba(200,164,74,0.14)" } },
+                    React.createElement(PixelIcon, { name: it.id, size: 26, fallback: SLOT_EMOJI[it.slot] })),
+                React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+                    React.createElement("div", { style: { fontWeight: "bold", fontSize: 12 } },
+                        it.name,
+                        " ",
+                        React.createElement("span", { style: { fontSize: 9, color: TIER_COLOR[it.tier] || "#9a7a30" } }, it.tier ? ("★".repeat(it.tier)) : "")),
+                    React.createElement("div", { style: { color: "#7a6030", fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, it.desc),
+                    ItemBadges(it),
+                    React.createElement("div", { style: { fontSize: 10, color: "#c8a44a", marginTop: 1 } }, Object.keys(it.stats).map(function (s) { return "+" + it.stats[s] + " " + s.toUpperCase(); }).join(" · "))),
+                React.createElement("div", { style: { textAlign: "right", flexShrink: 0 } },
+                    React.createElement("div", { style: { fontSize: 11, color: "#f0c060", marginBottom: 3 } },
+                        "\uD83D\uDCB0 ",
+                        it.price),
+                    React.createElement("button", { onClick: function () { if (ok) { SFX.buy(); onBuy(it); } }, disabled: !ok, style: Object.assign({}, S.btn, { opacity: ok ? 1 : 0.35 }) }, "Buy"))); }),
         React.createElement("div", { style: S.sec }, "\uD83E\uDDEA Potions"),
-        React.createElement("div", { style: { display: "flex", gap: 7, flexWrap: "wrap" } }, POTIONS.map(function (p) { var ok = gold >= p.price; return React.createElement("div", { key: p.id, style: { flex: 1, minWidth: 80, background: "#0a1e0a", border: "1px solid " + (ok ? "#2a6a2a" : "#1a3a1a"), borderRadius: 7, padding: "8px 6px", textAlign: "center", opacity: ok ? 1 : 0.55 } },
-            React.createElement("div", { style: { fontSize: 22 } }, p.emoji),
-            React.createElement("div", { style: { fontSize: 11, fontWeight: "bold", color: "#44dd88", marginBottom: 1 } }, p.name),
-            React.createElement("div", { style: { fontSize: 10, color: "#3a7a3a", marginBottom: 3 } },
-                "Heals ",
-                p.heal,
-                " HP"),
-            React.createElement("div", { style: { fontSize: 10, color: "#f0c060", marginBottom: 4 } },
-                "\uD83D\uDCB0 ",
-                p.price,
-                "g"),
-            React.createElement("button", { onClick: function () { if (ok) {
-                    SFX.buy();
-                    onBuyPotion(p);
-                } }, disabled: !ok, style: { padding: "4px 8px", background: ok ? "#1a3a1a" : "#0a1a0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 11, opacity: ok ? 1 : 0.35 } }, "Buy")); }))));
+        React.createElement("div", { style: { display: "flex", gap: 7, flexWrap: "wrap" } }, POTIONS.map(function (p) {
+            var ok = gold >= p.price;
+            var iconKey = p.id === "p1" ? "potion_small" : p.id === "p2" ? "potion_medium" : "potion_large";
+            return React.createElement("div", { key: p.id, style: { flex: 1, minWidth: 80, background: "#0a1e0a", border: "1px solid " + (ok ? "#2a6a2a" : "#1a3a1a"), borderRadius: 7, padding: "8px 6px", textAlign: "center", opacity: ok ? 1 : 0.55 } },
+                React.createElement("div", { style: { display:"flex", justifyContent:"center", marginBottom: 4 } },
+                    React.createElement(PixelIcon, { name: iconKey, size: 28, fallback: p.emoji })),
+                React.createElement("div", { style: { fontSize: 11, fontWeight: "bold", color: "#44dd88", marginBottom: 1 } }, p.name),
+                React.createElement("div", { style: { fontSize: 10, color: "#3a7a3a", marginBottom: 3 } },
+                    "Heals ",
+                    p.heal,
+                    " HP"),
+                React.createElement("div", { style: { fontSize: 10, color: "#f0c060", marginBottom: 4 } },
+                    "\uD83D\uDCB0 ",
+                    p.price,
+                    "g"),
+                React.createElement("button", { onClick: function () { if (ok) { SFX.buy(); onBuyPotion(p); } }, disabled: !ok, style: { padding: "4px 8px", background: ok ? "#1a3a1a" : "#0a1a0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 11, opacity: ok ? 1 : 0.35 } }, "Buy")); }))));
 }
 // ── JOBS TAB ──────────────────────────────────────────────────────────────────
 function JobsTab(props) {
@@ -1676,8 +2040,9 @@ function DungeonTab(props) {
         dungeons.map(function (d) { var cdLeft = cooldowns[d.id] ? Math.max(0, cooldowns[d.id] + COOLDOWN_MS - Date.now()) : 0; var onCD = cdLeft > 0; var canEnter = heroLevel >= d.minLevel && !onCD && !activeJob; var rarCol = RARITY_COLOR[d.lootTable]; return React.createElement("div", { key: d.id, style: Object.assign({}, S.card, { borderColor: canEnter ? rarCol : "#2e1e08", opacity: heroLevel >= d.minLevel ? 1 : 0.45 }) },
             React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "flex-start" } },
                 React.createElement("div", { style: { flex: 1 } },
-                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 5, marginBottom: 2 } },
-                        React.createElement("span", { style: { fontSize: 18 } }, d.emoji),
+                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, marginBottom: 2 } },
+                        React.createElement("div", { style: { width:30, height:30, background:"#0d0801", borderRadius:5, border:"1px solid "+rarCol+"44", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 } },
+                            React.createElement(PixelIcon, { name: enemyIconKey(d.sections[d.sections.length-1].enemy.name), size: 24, fallback: d.emoji })),
                         React.createElement("span", { style: { fontWeight: "bold", fontSize: 13 } }, d.name),
                         React.createElement("span", { style: { fontSize: 9, color: rarCol, background: "#1a1209", border: "1px solid " + rarCol, padding: "1px 4px", borderRadius: 3 } }, d.lootTable.toUpperCase())),
                     React.createElement("div", { style: { color: "#7a6030", fontSize: 10, marginBottom: 4 } }, d.desc),
@@ -1718,7 +2083,8 @@ function DungeonTab(props) {
 }
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 function App() {
-    var _sc = useState("loading");
+    // Start at title to avoid "infinite loading" if storage/CDN is flaky.
+    var _sc = useState("title");
     var screen = _sc[0];
     var setScreen = _sc[1];
     var _hs = useState(false);
@@ -1821,6 +2187,8 @@ function App() {
     var settingsOpen = _sOpen[0];
     var setSettingsOpen = _sOpen[1];
     var musicStarted = useRef(false);
+    // Audio unlock for mobile browsers (iOS/Android): resume AudioContext on first user gesture.
+    var audioUnlocked = useRef(false);
     var saveTimer = useRef(null);
     var globalSaveTimer = useRef(null);
     // Load global settings (volume, uiScale) — separate from character slots
@@ -1877,6 +2245,45 @@ function App() {
             setHasSave(hasSaveAny);
             setScreen("title");
         }).catch(function () { setScreen("title"); });
+    }, []);
+    // Global audio unlock: first touch/click on #root or document resumes AudioContext.
+    useEffect(function () {
+        function unlock() {
+            if (audioUnlocked.current)
+                return;
+            audioUnlocked.current = true;
+            try {
+                AM.resume();
+            }
+            catch (e) { }
+        }
+        var optsOnce = { passive: true, once: true };
+        var rootEl = null;
+        try {
+            rootEl = document.getElementById("root");
+        }
+        catch (e) { }
+        if (rootEl) {
+            rootEl.addEventListener("pointerdown", unlock, optsOnce);
+            rootEl.addEventListener("touchstart", unlock, optsOnce);
+            rootEl.addEventListener("click", unlock, optsOnce);
+        }
+        document.addEventListener("pointerdown", unlock, optsOnce);
+        document.addEventListener("touchstart", unlock, optsOnce);
+        document.addEventListener("click", unlock, optsOnce);
+        return function () {
+            try {
+                if (rootEl) {
+                    rootEl.removeEventListener("pointerdown", unlock, optsOnce);
+                    rootEl.removeEventListener("touchstart", unlock, optsOnce);
+                    rootEl.removeEventListener("click", unlock, optsOnce);
+                }
+                document.removeEventListener("pointerdown", unlock, optsOnce);
+                document.removeEventListener("touchstart", unlock, optsOnce);
+                document.removeEventListener("click", unlock, optsOnce);
+            }
+            catch (e) { }
+        };
     }, []);
     useEffect(function () {
         if (!hero)
@@ -2290,8 +2697,22 @@ function App() {
     var availQ = QUESTS.filter(function (q) { return q.minLevel <= hero.level; });
     window.__LANG = lang;
     var TABS = [["hero", "⚔️", T("Bohater", "Hero")], ["quests", "🗺️", T("Questy", "Quests")], ["inventory", "🎒", T("Torba", "Bag")], ["shop", "🏪", T("Sklep", "Shop")], ["dungeon", "🏰", "Dungeon"], ["jobs", "💼", T("Praca", "Jobs")], ["tavern", "🍺", "Tavern"]];
+    // Tab icon map (pixel-art slot icons where we have them)
+    var TAB_ICON = { hero: "str", quests: null, inventory: "accessory", shop: "potion_small", dungeon: null, jobs: null, tavern: null };
     return (React.createElement("div", { style: { width: "100%", minHeight: "100vh", background: "#0d0801", display: "flex", justifyContent: "center", alignItems: "flex-start" } },
-        React.createElement("div", { style: Object.assign({}, S.wrap, { zoom: uiScale, width: "100%" }) },
+        // UI scaling: `zoom` is not reliable on mobile Safari, so we provide a transform fallback.
+        React.createElement("div", { style: (function () {
+                var canZoom = false;
+                try {
+                    canZoom = !!(window.CSS && CSS.supports && CSS.supports("zoom", "1"));
+                }
+                catch (e) { }
+                if (canZoom) {
+                    return Object.assign({}, S.wrap, { zoom: uiScale, width: "100%" });
+                }
+                // Transform fallback keeps layout width consistent
+                return Object.assign({}, S.wrap, { transform: "scale(" + uiScale + ")", transformOrigin: "top center", width: (100 / uiScale) + "%" });
+            })() },
             React.createElement("style", null, ANIM_CSS),
             dungeonReward && React.createElement(DungeonReward, { dr: dungeonReward, onClaim: onDungeonRewardClaim }),
             !dungeonReward && dungeonBetween && React.createElement(DungeonBetween, { db: dungeonBetween, maxHp: hero.maxHp, potions: potions, perks: hero.perks || [], onContinue: onDungeonContinue, onFlee: onDungeonFlee, onHeal: onDungeonBetweenHeal }),
@@ -2302,10 +2723,8 @@ function App() {
             React.createElement("div", { style: S.hdr },
                 React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 2 } },
                     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
-                        React.createElement("span", { style: { fontSize: 14, fontWeight: "bold" } },
-                            CLASSES[hero.class].emoji,
-                            " ",
-                            hero.name),
+                        React.createElement(CharSprite, { iconKey: classIconKey(hero.class), emoji: CLASSES[hero.class].emoji, size: 22 }),
+                        React.createElement("span", { style: { fontSize: 14, fontWeight: "bold" } }, hero.name),
                         React.createElement("span", { style: { fontSize: 10, color: "#7a6030" } },
                             CLASSES[hero.class].name,
                             " Lv.",
@@ -2378,9 +2797,14 @@ function App() {
                     "/",
                     hero.xpNeeded,
                     " XP")),
-            React.createElement("div", { style: S.tabs }, TABS.map(function (t) { return React.createElement("button", { key: t[0], onClick: function () { setTab(t[0]); }, style: Object.assign({}, S.tab, tab === t[0] ? S.tabA : {}) },
-                t[1],
-                React.createElement("span", { style: { fontSize: 9, display: "block", marginTop: 1 } }, t[2])); })),
+            React.createElement("div", { style: S.tabs }, TABS.map(function (t) {
+                var isActive = tab === t[0];
+                var pxKey = TAB_ICON[t[0]];
+                return React.createElement("button", { key: t[0], onClick: function () { setTab(t[0]); }, style: Object.assign({}, S.tab, isActive ? S.tabA : {}) },
+                    pxKey
+                        ? React.createElement(PixelIcon, { name: pxKey, size: 16, style: { opacity: isActive ? 1 : 0.55 } })
+                        : React.createElement("span", { style: { fontSize: 15 } }, t[1]),
+                    React.createElement("span", { style: { fontSize: 9, display: "block", marginTop: 1, letterSpacing: 0.3 } }, t[2])); })),
             React.createElement("div", { style: S.body },
                 tab === "hero" && React.createElement(HeroTab, { hero: hero, equipped: equipped, stats: stats, potions: potions, onUnequip: unequipItem, onHeal: onHealHero, onInstantHeal: onInstantHeal }),
                 tab === "quests" && React.createElement(QuestsTab, { quests: availQ, questLog: questLog, stamina: stamina, activeJob: activeJob, onStart: function (q) { startTravel("quest", { quest: q }); } }),
