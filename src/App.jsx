@@ -107,7 +107,7 @@ export function App() {
     var _mSong = useState(0);
     var musicSong = _mSong[0];
     var setMusicSong = _mSong[1];
-    var _mVol = useState(0.5);
+    var _mVol = useState(0.2);
     var musicVol = _mVol[0];
     var setMusicVol = _mVol[1];
     var _uiSc = useState(function () { try { var vw = window.innerWidth; return vw < 500 ? Math.round(vw / 500 * 20) / 20 : 1; } catch (e) { return 1; } });
@@ -116,6 +116,9 @@ export function App() {
     var _sOpen = useState(false);
     var settingsOpen = _sOpen[0];
     var setSettingsOpen = _sOpen[1];
+    var _dbg = useState(false);
+    var debugMode = _dbg[0];
+    var setDebugMode = _dbg[1];
     var musicStarted = useRef(false);
     var audioUnlocked = useRef(false);
     var saveTimer = useRef(null);
@@ -541,7 +544,20 @@ export function App() {
                 React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
                     React.createElement("span", { style: { fontSize: 11, color: "#7a6030" } }, "🌍 ", T("Język", "Language")),
                     React.createElement("button", { onClick: function () { setLang(function (l) { return l === "pl" ? "en" : "pl"; }); }, style: { padding: "3px 10px", background: "#1e1206", border: "1px solid #c8a44a", color: "#c8a44a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 11 } }, lang === "pl" ? "🇵🇱 Polski → EN" : "🇬🇧 English → PL")),
-                React.createElement("div", { style: { fontSize: 9, color: "#4a3820", letterSpacing: 0.5, marginTop: 4 } }, "📱 Auto fits screen width · Range 70%–200%")),
+                React.createElement("div", { style: { fontSize: 9, color: "#4a3820", letterSpacing: 0.5, marginTop: 4 } }, "📱 Auto fits screen width · Range 70%–200%"),
+                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginTop: 6, borderTop: "1px solid #2e1e08", paddingTop: 6 } },
+                    React.createElement("span", { style: { fontSize: 11, color: "#7a6030" } }, "🐛 DEBUG"),
+                    React.createElement("button", { onClick: function () { setDebugMode(function (d) { return !d; }); }, style: { padding: "2px 10px", background: debugMode ? "#3a1a00" : "#1e1206", border: "1px solid " + (debugMode ? "#ff8c00" : "#4a3820"), color: debugMode ? "#ff8c00" : "#4a3820", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } }, debugMode ? "ON" : "OFF"))),
+            settingsOpen && debugMode && React.createElement("div", { style: { padding: "6px 12px 8px", background: "#0d0800", borderBottom: "1px solid #3a1a00", display: "flex", flexWrap: "wrap", gap: 5 } },
+                React.createElement("span", { style: { fontSize: 9, color: "#ff8c00", letterSpacing: 1, alignSelf: "center", marginRight: 4 } }, "🐛 DEBUG"),
+                React.createElement("button", { onClick: function () { setHero(function (h) { return Object.assign({}, h, { hp: h.maxHp }); }); notify("[DEBUG] Full HP"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "❤️ Full HP"),
+                React.createElement("button", { onClick: function () { setStamina(STAMINA_MAX); notify("[DEBUG] Full Stamina"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "⚡ Full Stamina"),
+                React.createElement("button", { onClick: function () { setGold(function (g) { return g + 1000; }); notify("[DEBUG] +1000 gold"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "💰 +1000g"),
+                React.createElement("button", { onClick: function () { setPotions({ small: 10, medium: 10, large: 10 }); notify("[DEBUG] Full potions"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "🧪 Fill Potions"),
+                React.createElement("button", { onClick: function () { setCooldowns({}); notify("[DEBUG] Cooldowns cleared"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "🏰 Clear Cooldowns"),
+                React.createElement("button", { onClick: function () { if (travelState) skipTravel(); else notify("[DEBUG] Not travelling", "err"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "⏩ Skip Travel"),
+                React.createElement("button", { onClick: function () { setPierogi(function (p) { return p + 5; }); notify("[DEBUG] +5 pierogi"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "🥟 +5 Pierogi"),
+                React.createElement("button", { onClick: function () { setHero(function (h) { return processXpGain(h, h.xpNeeded - h.xp); }); notify("[DEBUG] XP to next level"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "⭐ XP to LvlUp")),
             React.createElement("div", { style: { height: 7, background: "#150e04", position: "relative", borderBottom: "1px solid #2e1e08", overflow: "hidden" } },
                 React.createElement("div", { style: { width: xpPct + "%", height: "100%", background: "linear-gradient(90deg,#5a3808,#e0b040,#f8d060)", transition: "width 0.5s", position: "relative", overflow: "hidden" } },
                     React.createElement("div", { style: { position: "absolute", top: 0, left: 0, height: "100%", width: "35%", background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.26),transparent)", animation: "xpShine 3s ease-in-out infinite" } })),
