@@ -107,15 +107,18 @@ export function App() {
     var _mSong = useState(0);
     var musicSong = _mSong[0];
     var setMusicSong = _mSong[1];
-    var _mVol = useState(0.5);
+    var _mVol = useState(0.05);
     var musicVol = _mVol[0];
     var setMusicVol = _mVol[1];
-    var _uiSc = useState(function () { try { var vw = window.innerWidth; return vw < 500 ? Math.round(vw / 500 * 20) / 20 : 1; } catch (e) { return 1; } });
+    var _uiSc = useState(function () { try { var vw = window.innerWidth; return Math.max(0.7, Math.min(2.5, Math.round(vw / 700 * 10) / 10)); } catch (e) { return 1; } });
     var uiScale = _uiSc[0];
     var setUiScale = _uiSc[1];
     var _sOpen = useState(false);
     var settingsOpen = _sOpen[0];
     var setSettingsOpen = _sOpen[1];
+    var _dbg = useState(false);
+    var debugMode = _dbg[0];
+    var setDebugMode = _dbg[1];
     var musicStarted = useRef(false);
     var audioUnlocked = useRef(false);
     var saveTimer = useRef(null);
@@ -452,7 +455,7 @@ export function App() {
         setTab("quests");
     };
     var onTavernResult = function (profit) { if (profit === 0) return; setGold(function (g) { return Math.max(0, g + profit); }); if (profit > 0) notify("🏆 +" + profit + "g!"); else notify("💀 −" + Math.abs(profit) + "g", "err"); };
-    var changeScale = function (v) { setUiScale(Math.max(0.7, Math.min(2.0, Math.round(v * 100) / 100))); };
+    var changeScale = function (v) { setUiScale(Math.max(0.7, Math.min(2.5, Math.round(v * 100) / 100))); };
     var startJob = function (job) { if (activeJob) return; SFX.enter(); setActiveJob({ jobId: job.id, startedAt: Date.now() }); notify(T("💼 Wyruszono do pracy: ", "💼 Left for work: ") + job.emoji + " " + T(job.name, job.nameEn)); };
     var cancelJob = function () { if (!activeJob) return; setActiveJob(null); notify(T("❌ Praca anulowana.", "❌ Job cancelled."), "err"); };
     var drinkBeer = function () {
@@ -502,26 +505,53 @@ export function App() {
             !dungeonReward && !dungeonBetween && !combatData && travelState && React.createElement(TravelScreen, { ts: travelState, onSkip: skipTravel }),
             !dungeonReward && !dungeonBetween && !combatData && !travelState && levelUpState && React.createElement(LevelUpOverlay, { luInfo: levelUpState, hero: hero, onConfirm: onLevelUpConfirm }),
             notif && React.createElement("div", { style: { position: "fixed", top: 14, left: "50%", transform: "translateX(-50%)", padding: "9px 18px", borderRadius: 6, fontSize: 13, zIndex: 9999, border: "1px solid rgba(255,255,255,0.15)", maxWidth: "90%", textAlign: "center", fontFamily: "Georgia,serif", pointerEvents: "none", background: notif.type === "err" ? "#6a1a1a" : "#1a4a2a" } }, notif.msg),
+            settingsOpen && React.createElement("div", { style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.72)", zIndex: 200, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 90 }, onClick: function () { setSettingsOpen(false); } },
+                React.createElement("div", { style: { background: "#120d04", border: "1px solid #c8a44a55", borderRadius: 12, padding: "14px 16px", width: 300, boxShadow: "0 8px 32px rgba(0,0,0,0.85)" }, onClick: function (e) { e.stopPropagation(); } },
+                    React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 } },
+                        React.createElement("span", { style: { fontSize: 13, fontWeight: "bold", color: "#c8a44a" } }, "⚙️ ", T("Ustawienia", "Settings")),
+                        React.createElement("button", { onClick: function () { setSettingsOpen(false); }, style: { background: "none", border: "none", color: "#7a6030", fontSize: 16, cursor: "pointer", fontFamily: "Georgia,serif", lineHeight: 1 } }, "✕")),
+                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, marginBottom: 8 } },
+                        React.createElement("span", { style: { fontSize: 11, color: "#7a6030", whiteSpace: "nowrap" } }, "📐 ", T("Skala", "Scale")),
+                        React.createElement("button", { onClick: function () { changeScale(uiScale - 0.05); }, style: Object.assign({}, S.mBtn, { fontSize: 15, lineHeight: 1 }) }, "−"),
+                        React.createElement("input", { type: "range", min: "70", max: "250", value: Math.round(uiScale * 100), onChange: function (e) { changeScale(parseInt(e.target.value) / 100); }, style: { flex: 1 } }),
+                        React.createElement("button", { onClick: function () { changeScale(uiScale + 0.05); }, style: Object.assign({}, S.mBtn, { fontSize: 15, lineHeight: 1 }) }, "+"),
+                        React.createElement("span", { style: { fontSize: 12, fontWeight: "bold", color: "#c8a44a", minWidth: 38, textAlign: "right" } }, Math.round(uiScale * 100), "%"),
+                        React.createElement("button", { onClick: function () { try { var vw = window.innerWidth; changeScale(Math.max(0.7, Math.min(2.5, Math.round(vw / 700 * 10) / 10))); } catch (e) { changeScale(1); } }, style: Object.assign({}, S.mBtn, { fontSize: 10, color: "#6a9a6a", border: "1px solid #2a5a2a", borderRadius: 3, padding: "2px 5px" }) }, "Auto")),
+                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
+                        React.createElement("span", { style: { fontSize: 11, color: "#7a6030" } }, "🌍 ", T("Język", "Language")),
+                        React.createElement("button", { onClick: function () { setLang(function (l) { return l === "pl" ? "en" : "pl"; }); }, style: { padding: "3px 10px", background: "#1e1206", border: "1px solid #c8a44a", color: "#c8a44a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 11 } }, lang === "pl" ? "🇵🇱 Polski → EN" : "🇬🇧 English → PL")),
+                    React.createElement("div", { style: { fontSize: 9, color: "#4a3820", letterSpacing: 0.5, marginBottom: 8 } }, "📱 Auto fits screen width · Range 70%–250%"),
+                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, borderTop: "1px solid #2e1e08", paddingTop: 8 } },
+                        React.createElement("span", { style: { fontSize: 11, color: "#7a6030" } }, "🐛 DEBUG"),
+                        React.createElement("button", { onClick: function () { setDebugMode(function (d) { return !d; }); }, style: { padding: "2px 10px", background: debugMode ? "#3a1a00" : "#1e1206", border: "1px solid " + (debugMode ? "#ff8c00" : "#4a3820"), color: debugMode ? "#ff8c00" : "#4a3820", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } }, debugMode ? "ON" : "OFF")),
+                    debugMode && React.createElement("div", { style: { marginTop: 8, display: "flex", flexWrap: "wrap", gap: 5 } },
+                        React.createElement("button", { onClick: function () { setHero(function (h) { return Object.assign({}, h, { hp: h.maxHp }); }); notify("[DEBUG] Full HP"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "❤️ Full HP"),
+                        React.createElement("button", { onClick: function () { setStamina(STAMINA_MAX); notify("[DEBUG] Full Stamina"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "⚡ Full Stamina"),
+                        React.createElement("button", { onClick: function () { setGold(function (g) { return g + 1000; }); notify("[DEBUG] +1000 gold"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "💰 +1000g"),
+                        React.createElement("button", { onClick: function () { setPotions({ small: 10, medium: 10, large: 10 }); notify("[DEBUG] Full potions"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "🧪 Fill Potions"),
+                        React.createElement("button", { onClick: function () { setCooldowns({}); notify("[DEBUG] Cooldowns cleared"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "🏰 Clear Cooldowns"),
+                        React.createElement("button", { onClick: function () { if (travelState) skipTravel(); else notify("[DEBUG] Not travelling", "err"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "⏩ Skip Travel"),
+                        React.createElement("button", { onClick: function () { setPierogi(function (p) { return p + 5; }); notify("[DEBUG] +5 pierogi"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "🥟 +5 Pierogi"),
+                        React.createElement("button", { onClick: function () { setHero(function (h) { return processXpGain(h, h.xpNeeded - h.xp); }); notify("[DEBUG] XP to next level"); }, style: { padding: "3px 8px", background: "#1e0a00", border: "1px solid #ff8c00", color: "#ff8c00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 3, fontSize: 10 } }, "⭐ XP to LvlUp")))),
             React.createElement("div", { style: S.hdr },
-                React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 2 } },
-                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
-                        React.createElement(CharSprite, { iconKey: classIconKey(hero.class), emoji: CLASSES[hero.class].emoji, size: 22 }),
-                        React.createElement("span", { style: { fontSize: 14, fontWeight: "bold" } }, hero.name),
-                        React.createElement("span", { style: { fontSize: 10, color: "#7a6030" } }, CLASSES[hero.class].name, " Lv.", hero.level)),
-                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
-                        React.createElement("button", { onClick: function () { saveNow(function () { notify(T("💾 Zapisano!", "💾 Saved!")); setScreen("title"); }); }, style: { padding: "3px 9px", background: "#1e1206", border: "1px solid #c8a44a", color: "#c8a44a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10, letterSpacing: 0.5 } },
-                            "💾 ", T("Zapisz i wyjdź", "Save & Exit")),
-                        activeJob && React.createElement("span", { style: { fontSize: 9, color: "#f0c060" } }, "💼 ", T("W pracy...", "Working...")))),
-                React.createElement("div", { style: { textAlign: "right" } },
-                    React.createElement("div", { style: { display: "flex", gap: 7, justifyContent: "flex-end", alignItems: "center", marginBottom: 2 } },
-                        React.createElement("span", { style: { fontSize: 11, color: "#c8a44a", fontWeight: "bold" } }, "💰 ", gold),
-                        React.createElement("span", { style: { fontSize: 11, color: "#c8e4ff" } }, "🥟 ", pierogi)),
-                    React.createElement("div", { style: { width: 80 } },
-                        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", fontSize: 8, color: "#5a7090", marginBottom: 1 } },
-                            React.createElement("span", null, "⚡ ", T("Stamina", "Stamina")),
-                            React.createElement("span", { style: { color: stamina < 20 ? "#dd4444" : "#5a7090" } }, stamina, "/", STAMINA_MAX)),
-                        React.createElement("div", { style: { background: "#0a0c14", borderRadius: 3, overflow: "hidden", height: 6, border: "1px solid #1e2a3a" } },
-                            React.createElement("div", { style: { width: (stamina / STAMINA_MAX * 100) + "%", height: "100%", background: stamina < 20 ? "linear-gradient(90deg,#6a1010,#dd3333)" : "linear-gradient(90deg,#1a4a8a,#44aaff)", transition: "width 0.4s" } }))))),
+                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, minWidth: 0 } },
+                    React.createElement(CharSprite, { iconKey: classIconKey(hero.class), emoji: CLASSES[hero.class].emoji, size: 26 }),
+                    React.createElement("div", { style: { minWidth: 0 } },
+                        React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 5, flexWrap: "wrap" } },
+                            React.createElement("span", { style: { fontSize: 14, fontWeight: "bold", whiteSpace: "nowrap" } }, hero.name),
+                            React.createElement("span", { style: { fontSize: 10, color: "#7a6030", whiteSpace: "nowrap" } }, CLASSES[hero.class].name, " Lv.", hero.level),
+                            activeJob && React.createElement("span", { style: { fontSize: 9, color: "#f0c060", whiteSpace: "nowrap" } }, "💼")),
+                        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginTop: 2 } },
+                            React.createElement("span", { style: { fontSize: 11, color: "#c8a44a", fontWeight: "bold" } }, "💰 ", gold),
+                            React.createElement("span", { style: { fontSize: 11, color: "#c8e4ff" } }, "🥟 ", pierogi)))),
+                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexShrink: 0 } },
+                    React.createElement("div", { style: { width: 72 } },
+                        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", fontSize: 8, color: stamina < 20 ? "#dd4444" : "#5a7090", marginBottom: 1 } },
+                            React.createElement("span", null, "⚡"),
+                            React.createElement("span", null, stamina, "/", STAMINA_MAX)),
+                        React.createElement("div", { style: { background: "#0a0c14", borderRadius: 3, overflow: "hidden", height: 5, border: "1px solid #1e2a3a" } },
+                            React.createElement("div", { style: { width: (stamina / STAMINA_MAX * 100) + "%", height: "100%", background: stamina < 20 ? "linear-gradient(90deg,#6a1010,#dd3333)" : "linear-gradient(90deg,#1a4a8a,#44aaff)", transition: "width 0.4s" } }))),
+                    React.createElement("button", { onClick: function () { saveNow(function () { notify(T("💾 Zapisano!", "💾 Saved!")); setScreen("title"); }); }, title: T("Zapisz i wyjdź", "Save & Exit"), style: { padding: "6px 9px", background: "#1e1206", border: "1px solid #c8a44a55", color: "#c8a44a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 6, fontSize: 14, minHeight: 36, lineHeight: 1 } }, "💾"))),
             React.createElement("div", { style: S.mbar },
                 React.createElement("button", { onClick: function () { AM.resume(); musicPrev(); }, style: S.mBtn }, "◀"),
                 React.createElement("button", { onClick: function () { AM.resume(); toggleMusic(); }, style: S.mBtn }, musicOn ? "⏸" : "▶"),
@@ -530,18 +560,6 @@ export function App() {
                 React.createElement("span", { style: { fontSize: 10, color: "#6a5020" } }, "🔊"),
                 React.createElement("input", { type: "range", min: "0", max: "100", value: Math.round(musicVol * 100), onChange: function (e) { var v = parseFloat(e.target.value) / 100; setMusicVol(v); AM.setMusVol(v); }, style: { width: 50 } }),
                 React.createElement("button", { onClick: function () { setSettingsOpen(function (o) { return !o; }); }, title: "Display settings", style: Object.assign({}, S.mBtn, { fontSize: 14, color: settingsOpen ? "#f0c060" : "#7a6030", marginLeft: 3 }) }, "⚙️")),
-            settingsOpen && React.createElement("div", { style: { padding: "7px 12px", background: "#100c04", borderBottom: "1px solid #2e1e08" } },
-                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, marginBottom: 6 } },
-                    React.createElement("span", { style: { fontSize: 11, color: "#7a6030", whiteSpace: "nowrap" } }, "📐 ", T("Skala", "Scale")),
-                    React.createElement("button", { onClick: function () { changeScale(uiScale - 0.05); }, style: Object.assign({}, S.mBtn, { fontSize: 15, lineHeight: 1 }) }, "−"),
-                    React.createElement("input", { type: "range", min: "70", max: "200", value: Math.round(uiScale * 100), onChange: function (e) { changeScale(parseInt(e.target.value) / 100); }, style: { flex: 1 } }),
-                    React.createElement("button", { onClick: function () { changeScale(uiScale + 0.05); }, style: Object.assign({}, S.mBtn, { fontSize: 15, lineHeight: 1 }) }, "+"),
-                    React.createElement("span", { style: { fontSize: 12, fontWeight: "bold", color: "#c8a44a", minWidth: 38, textAlign: "right" } }, Math.round(uiScale * 100), "%"),
-                    React.createElement("button", { onClick: function () { try { var vw = window.innerWidth; changeScale(vw < 500 ? Math.round(vw / 500 * 20) / 20 : 1); } catch (e) { changeScale(1); } }, style: Object.assign({}, S.mBtn, { fontSize: 10, color: "#6a9a6a", border: "1px solid #2a5a2a", borderRadius: 3, padding: "2px 5px" }) }, "Auto")),
-                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
-                    React.createElement("span", { style: { fontSize: 11, color: "#7a6030" } }, "🌍 ", T("Język", "Language")),
-                    React.createElement("button", { onClick: function () { setLang(function (l) { return l === "pl" ? "en" : "pl"; }); }, style: { padding: "3px 10px", background: "#1e1206", border: "1px solid #c8a44a", color: "#c8a44a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 11 } }, lang === "pl" ? "🇵🇱 Polski → EN" : "🇬🇧 English → PL")),
-                React.createElement("div", { style: { fontSize: 9, color: "#4a3820", letterSpacing: 0.5, marginTop: 4 } }, "📱 Auto fits screen width · Range 70%–200%")),
             React.createElement("div", { style: { height: 7, background: "#150e04", position: "relative", borderBottom: "1px solid #2e1e08", overflow: "hidden" } },
                 React.createElement("div", { style: { width: xpPct + "%", height: "100%", background: "linear-gradient(90deg,#5a3808,#e0b040,#f8d060)", transition: "width 0.5s", position: "relative", overflow: "hidden" } },
                     React.createElement("div", { style: { position: "absolute", top: 0, left: 0, height: "100%", width: "35%", background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.26),transparent)", animation: "xpShine 3s ease-in-out infinite" } })),
@@ -551,9 +569,9 @@ export function App() {
                 var pxKey = TAB_ICON[t[0]];
                 return React.createElement("button", { key: t[0], onClick: function () { setTab(t[0]); }, style: Object.assign({}, S.tab, isActive ? S.tabA : {}) },
                     pxKey ? React.createElement(PixelIcon, { name: pxKey, size: 16, style: { opacity: isActive ? 1 : 0.55 } }) : React.createElement("span", { style: { fontSize: 15 } }, t[1]),
-                    React.createElement("span", { style: { fontSize: 9, display: "block", marginTop: 1, letterSpacing: 0.3 } }, t[2])); })),
+                    React.createElement("span", { className: "ps-tab-label", style: { fontSize: 9, display: "block", marginTop: 1, letterSpacing: 0.3 } }, t[2])); })),
             React.createElement("div", { style: S.body },
-                tab === "hero" && React.createElement(HeroTab, { hero: hero, equipped: equipped, stats: stats, potions: potions, onUnequip: unequipItem, onHeal: onHealHero, onInstantHeal: onInstantHeal }),
+                tab === "hero" && React.createElement(HeroTab, { hero: hero, equipped: equipped, stats: stats, potions: potions, onUnequip: unequipItem, onHeal: onHealHero }),
                 tab === "quests" && React.createElement(QuestsTab, { quests: availQ, questLog: questLog, stamina: stamina, activeJob: activeJob, onStart: function (q) { startTravel("quest", { quest: q }); } }),
                 tab === "inventory" && React.createElement(InventoryTab, { inventory: inventory, hero: hero, potions: potions, onEquip: equipItem, onSell: sellItem, onHeal: onHealHero }),
                 tab === "shop" && React.createElement(ShopTab, { items: ITEMS, gold: gold, potions: potions, onBuy: buyItem, onBuyPotion: buyPotion, heroClass: hero.class, equipped: equipped, shopPool: shopPool, setShopPool: setShopPool, shopSpecial: shopSpecial, setShopSpecial: setShopSpecial, shopRefreshAt: shopRefreshAt, setShopRefreshAt: setShopRefreshAt }),

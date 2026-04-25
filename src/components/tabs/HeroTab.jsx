@@ -7,7 +7,7 @@ import { PixelIcon, CharSprite, classIconKey } from '../icons.jsx';
 
 export function HeroTab(props) {
     var hero = props.hero, equipped = props.equipped, stats = props.stats, potions = props.potions;
-    var onUnequip = props.onUnequip, onHeal = props.onHeal, onInstantHeal = props.onInstantHeal;
+    var onUnequip = props.onUnequip, onHeal = props.onHeal;
     var hpPct = hero.hp / hero.maxHp * 100;
     var xpPct = hero.xp / hero.xpNeeded * 100;
     var perks = hero.perks || [];
@@ -65,8 +65,7 @@ export function HeroTab(props) {
                         potions.medium > 0 && React.createElement("button", { onClick: function () { onHeal("medium", getPotionHeal(60, perks)); }, style: { padding: "4px 9px", background: "#0a1e0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } },
                             "⚗️ +", getPotionHeal(60, perks), " (", potions.medium, ")"),
                         potions.large > 0 && React.createElement("button", { onClick: function () { onHeal("large", getPotionHeal(100, perks)); }, style: { padding: "4px 9px", background: "#0a1e0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } },
-                            "🫙 +", getPotionHeal(100, perks), " (", potions.large, ")"))),
-                    React.createElement("button", { onClick: onInstantHeal, style: { padding: "4px 9px", background: "#1e1a06", border: "1px solid #aa7000", color: "#ffaa00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } }, "⚡ Full Heal [α]"))),
+                            "🫙 +", getPotionHeal(100, perks), " (", potions.large, ")"))))),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } }, ["str", "agi", "int", "con"].map(function (st) {
                 var sc = STAT_COLOR[st];
                 var isH = hovStat === st;
@@ -104,7 +103,7 @@ export function HeroTab(props) {
             }))),
         React.createElement("div", { style: S.sec }, "🎽 Ekwipunek"),
         Object.keys(SLOT_EMOJI).map(function (slot) { var it = equipped[slot]; return React.createElement("div", { key: slot, style: Object.assign({}, S.row, { opacity: it ? 1 : 0.45 }) },
-            React.createElement(PixelIcon, { name: slot, size: 24, style: it ? {} : { opacity: 0.45, filter: "grayscale(1) brightness(0.85) drop-shadow(0 1px 2px rgba(0,0,0,0.6))" } }),
+            React.createElement(PixelIcon, { name: it ? it.id : slot, size: 24, style: it ? {} : { opacity: 0.45, filter: "grayscale(1) brightness(0.85) drop-shadow(0 1px 2px rgba(0,0,0,0.6))" } }),
             React.createElement("div", { style: { flex: 1, minWidth: 0 } },
                 React.createElement("div", { style: { fontWeight: "bold", fontSize: 12, color: it && it.rarity ? RARITY_COLOR[it.rarity] : "#c8a44a" } }, it ? it.name : "Empty " + slot),
                 it && React.createElement("div", { style: { color: "#7a6030", fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, it.desc),
