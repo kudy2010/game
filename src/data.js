@@ -1,3 +1,6 @@
+// ── TRANSLATIONS ──────────────────────────────────────────────────────────────
+export var T = function (pl, en) { return (typeof window !== "undefined" && window.__LANG === "en") ? en : pl; };
+
 // ── PERKS ─────────────────────────────────────────────────────────────────────
 export var PERKS = [
     { id: "iron_skin", name: T("Żelazna Skóra", "Iron Skin"), emoji: "🛡️", desc: T("Szansa na blok +10%", "Block chance +10%"), sB: { _blockBonus: 10 } },
@@ -41,10 +44,6 @@ export var CLASS_TAG_INFO = {
     musketeer: { label: T("🎯 Muszkieter", "🎯 Musk."),  color: "#44bbdd", bg: "#001a2a" },
     alchemist: { label: T("✨ Alchemik", "✨ Alch."),  color: "#cc77ff", bg: "#1a0028" },
 };
-
-// ── TRANSLATIONS ──────────────────────────────────────────────────────────────
-export var T = function (pl, en) { return (typeof window !== "undefined" && window.__LANG === "en") ? en : pl; };
-
 
 // ── QUEST DIFFICULTY ──────────────────────────────────────────────────────────
 export function getQuestDiff(minLevel) {
