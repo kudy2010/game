@@ -45,6 +45,7 @@ export var CLASS_TAG_INFO = {
 // ── TRANSLATIONS ──────────────────────────────────────────────────────────────
 export var T = function (pl, en) { return (typeof window !== "undefined" && window.__LANG === "en") ? en : pl; };
 
+
 // ── QUEST DIFFICULTY ──────────────────────────────────────────────────────────
 export function getQuestDiff(minLevel) {
     if (minLevel <= 1) return { label: T("Łatwe", "Easy"),   color: "#44dd88", bg: "#0a2010", pulse: false };
