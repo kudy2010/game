@@ -33,6 +33,7 @@ export var ANIM_CSS = [
     "input[type=text],input[type=text]:focus{background:#150e04 !important;color:#c8a44a !important;caret-color:#c8a44a}",
     "input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 1000px #150e04 inset !important;-webkit-text-fill-color:#c8a44a !important;border:1px solid #3a2a10 !important;transition:background-color 5000s ease-in-out 0s}",
     "input::placeholder{color:#4a3820 !important;opacity:1}",
+    "@media (max-width:480px){.ps-tab-label{display:none}}",
 ].join("\n");
 
 // ── ICONS ─────────────────────────────────────────────────────────────────────
@@ -114,7 +115,7 @@ export var LC = { miss: "#5a5a6a", dodge: "#3ab4d4", block: "#ccaa20", hit: "#e0
 export var S = {
     wrap:    { background: "radial-gradient(1200px 700px at 50% -20%, rgba(200,164,74,0.08), transparent 55%), #0d0801", minHeight: "100vh", color: "#c8a44a", fontFamily: "Georgia,serif", maxWidth: 640, margin: "0 auto", position: "relative", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)", paddingBottom: "env(safe-area-inset-bottom)" },
     hdr:     { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 14px", background: "linear-gradient(180deg,#1a1107,#130c04)", borderBottom: "1px solid rgba(200,164,74,0.22)", boxShadow: "0 10px 24px rgba(0,0,0,0.65)" },
-    mbar:    { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "linear-gradient(180deg,#130c04,#0f0903)", borderBottom: "1px solid rgba(200,164,74,0.14)" },
+    mbar:    { display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", background: "linear-gradient(180deg,#130c04,#0f0903)", borderBottom: "1px solid rgba(200,164,74,0.14)" },
     xpWrap:  { height: 5, background: "#150e04", position: "relative", borderBottom: "1px solid #2e1e08" },
     tabs:    { display: "flex", background: "linear-gradient(180deg,#160e05,#0f0903)", borderBottom: "1px solid rgba(200,164,74,0.14)" },
     tab:     { flex: 1, padding: "10px 2px", background: "none", border: "none", color: "#7a6030", cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 15, transition: "all 0.15s", borderBottom: "2px solid transparent", minHeight: 48 },
@@ -125,7 +126,7 @@ export var S = {
     sec:     { fontSize: 12, color: "#7a6030", borderBottom: "1px solid #2e1e08", paddingBottom: 4, marginBottom: 9, letterSpacing: 1, textTransform: "uppercase" },
     bigBtn:  { background: "linear-gradient(180deg,#6a4210,#2a1a07)", border: "2px solid rgba(200,164,74,0.95)", color: "#f0c060", padding: "12px 18px", fontSize: 14, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 12, letterSpacing: 1, boxShadow: "0 12px 22px rgba(0,0,0,0.55), 0 0 18px rgba(200,164,74,0.12), inset 0 1px 0 rgba(255,255,255,0.08)", transition: "filter .15s ease, transform .12s ease", minHeight: 48 },
     btn:     { background: "linear-gradient(180deg,#221408,#160d04)", border: "1px solid rgba(200,164,74,0.22)", color: "#c8a44a", padding: "10px 12px", fontSize: 11, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 10, whiteSpace: "nowrap", boxShadow: "0 8px 16px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.05)", transition: "filter .15s ease, transform .12s ease", minHeight: 48 },
-    mBtn:    { background: "linear-gradient(180deg,rgba(200,164,74,0.08),rgba(200,164,74,0.02))", border: "1px solid rgba(200,164,74,0.18)", color: "#9a7030", cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 13, padding: "8px 10px", borderRadius: 10, minHeight: 48 },
+    mBtn:    { background: "linear-gradient(180deg,rgba(200,164,74,0.08),rgba(200,164,74,0.02))", border: "1px solid rgba(200,164,74,0.18)", color: "#9a7030", cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 12, padding: "5px 8px", borderRadius: 8, minHeight: 32 },
     overlay: { position: "fixed", inset: 0, background: "#090601", zIndex: 200, display: "flex", flexDirection: "column", fontFamily: "Georgia,serif", maxWidth: 500, margin: "0 auto", color: "#c8a44a", overflowY: "auto", paddingTop: "env(safe-area-inset-top)", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)", paddingBottom: "env(safe-area-inset-bottom)" },
     inp:     { width: "100%", padding: "9px 12px", background: "#150e04", border: "1px solid #3a2a10", color: "#c8a44a", fontFamily: "Georgia,serif", fontSize: 15, borderRadius: 5, boxSizing: "border-box", outline: "none" },
 };
