@@ -113,7 +113,7 @@ export var LC = { miss: "#5a5a6a", dodge: "#3ab4d4", block: "#ccaa20", hit: "#e0
 // ── UI STYLE OBJECT ───────────────────────────────────────────────────────────
 export var S = {
     wrap:    { background: "radial-gradient(1200px 700px at 50% -20%, rgba(200,164,74,0.08), transparent 55%), #0d0801", minHeight: "100vh", color: "#c8a44a", fontFamily: "Georgia,serif", maxWidth: 640, margin: "0 auto", position: "relative", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)", paddingBottom: "env(safe-area-inset-bottom)" },
-    hdr:     { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(180deg,#1a1107,#130c04)", borderBottom: "1px solid rgba(200,164,74,0.22)", boxShadow: "0 10px 24px rgba(0,0,0,0.65)" },
+    hdr:     { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 14px", background: "linear-gradient(180deg,#1a1107,#130c04)", borderBottom: "1px solid rgba(200,164,74,0.22)", boxShadow: "0 10px 24px rgba(0,0,0,0.65)" },
     mbar:    { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "linear-gradient(180deg,#130c04,#0f0903)", borderBottom: "1px solid rgba(200,164,74,0.14)" },
     xpWrap:  { height: 5, background: "#150e04", position: "relative", borderBottom: "1px solid #2e1e08" },
     tabs:    { display: "flex", background: "linear-gradient(180deg,#160e05,#0f0903)", borderBottom: "1px solid rgba(200,164,74,0.14)" },
