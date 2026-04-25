@@ -12,8 +12,8 @@ export function DungeonTab(props) {
     var setTick = _t[1];
     useEffect(function () { var any = Object.keys(cooldowns).some(function (k) { return (cooldowns[k] || 0) + COOLDOWN_MS > Date.now(); }); if (!any) return; var id = setInterval(function () { setTick(function (n) { return n + 1; }); }, 1000); return function () { clearInterval(id); }; }, [cooldowns]);
     return (React.createElement("div", null,
-        React.createElement("div", { style: S.sec }, "🏰 Dungeons"),
-        React.createElement("div", { style: { fontSize: 11, color: "#7a6030", marginBottom: 9, padding: "5px 9px", background: "#150e04", border: "1px solid #2e1e08", borderRadius: 6 } }, "Dungeons reward exclusive Rare, Epic and Legendary items. 15-min cooldown after completion."),
+        React.createElement("div", { style: S.sec }, T("🏰 Lochy", "🏰 Dungeons")),
+        React.createElement("div", { style: { fontSize: 11, color: "#7a6030", marginBottom: 9, padding: "5px 9px", background: "#150e04", border: "1px solid #2e1e08", borderRadius: 6 } }, T("Lochy nagradzają wyłącznie przedmioty Rzadkie, Epickie i Legendarne. 15-minutowa przerwa po ukończeniu.", "Dungeons reward exclusive Rare, Epic and Legendary items. 15-min cooldown after completion.")),
         activeJob && React.createElement("div", { style: { background: "#1a1206", border: "1px solid #f0c06044", borderRadius: 7, padding: "8px 12px", marginBottom: 10, fontSize: 11, color: "#f0c060" } },
             "💼 ", T("Jesteś w pracy — lochy niedostępne.", "You are working — dungeons unavailable.")),
         dungeons.map(function (d) { var cdLeft = cooldowns[d.id] ? Math.max(0, cooldowns[d.id] + COOLDOWN_MS - Date.now()) : 0; var onCD = cdLeft > 0; var canEnter = heroLevel >= d.minLevel && !onCD && !activeJob; var rarCol = RARITY_COLOR[d.lootTable]; return React.createElement("div", { key: d.id, style: Object.assign({}, S.card, { borderColor: canEnter ? rarCol : "#2e1e08", opacity: heroLevel >= d.minLevel ? 1 : 0.45 }) },

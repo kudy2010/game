@@ -75,12 +75,12 @@ export function ShopTab(props) {
                     React.createElement("div", { style: { fontSize: 10, color: RARITY_COLOR[shopSpecial.rarity], marginTop: 1 } }, Object.keys(shopSpecial.stats).map(function (s) { return "+" + shopSpecial.stats[s] + " " + s.toUpperCase(); }).join(" · "))),
                 React.createElement("div", { style: { textAlign: "right", flexShrink: 0 } },
                     React.createElement("div", { style: { fontSize: 11, color: "#f0c060", marginBottom: 3 } }, "💰 ", shopSpecial.shopPrice),
-                    React.createElement("button", { onClick: function () { if (gold >= shopSpecial.shopPrice) { SFX.rareItem(); onBuy(Object.assign({}, shopSpecial, { price: shopSpecial.shopPrice })); setShopSpecial(null); } }, disabled: gold < shopSpecial.shopPrice, style: Object.assign({}, S.btn, { borderColor: RARITY_COLOR[shopSpecial.rarity], color: RARITY_COLOR[shopSpecial.rarity], opacity: gold >= shopSpecial.shopPrice ? 1 : 0.35 }) }, "Kup")))),
-        React.createElement("div", { style: S.sec }, "🛒 Equipment"),
+                    React.createElement("button", { onClick: function () { if (gold >= shopSpecial.shopPrice) { SFX.rareItem(); onBuy(Object.assign({}, shopSpecial, { price: shopSpecial.shopPrice })); setShopSpecial(null); } }, disabled: gold < shopSpecial.shopPrice, style: Object.assign({}, S.btn, { borderColor: RARITY_COLOR[shopSpecial.rarity], color: RARITY_COLOR[shopSpecial.rarity], opacity: gold >= shopSpecial.shopPrice ? 1 : 0.35 }) }, T("Kup", "Buy"))))),
+        React.createElement("div", { style: S.sec }, T("🛒 Ekwipunek", "🛒 Equipment")),
         React.createElement("div", { style: { display: "flex", gap: 4, marginBottom: 9, flexWrap: "wrap" } },
             ctInfo && React.createElement("button", { onClick: function () { setFilter("myclass"); }, style: { background: filter === "myclass" ? ctInfo.bg : "#150e04", border: "2px solid " + (filter === "myclass" ? ctInfo.color : ctInfo.color + "44"), color: ctInfo.color, padding: "4px 7px", fontSize: 10, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontWeight: "bold" } }, ctInfo.label),
             slots.map(function (s) { return React.createElement("button", { key: s, onClick: function () { setFilter(s); }, style: { background: filter === s ? "#2e1e08" : "#150e04", border: "1px solid " + (filter === s ? "#c8a44a" : "#4a3210"), color: "#c8a44a", padding: "4px 7px", fontSize: 10, fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, display:"flex", alignItems:"center", gap: 4 } },
-                s === "all" ? "📦 All" : React.createElement(React.Fragment, null, React.createElement(PixelIcon, { name: s, size: 16, fallback: SLOT_EMOJI[s] }), " ", s)); })),
+                s === "all" ? T("📦 Wszystkie", "📦 All") : React.createElement(React.Fragment, null, React.createElement(PixelIcon, { name: s, size: 16, fallback: SLOT_EMOJI[s] }), " ", s)); })),
         filtered.map(function (it) {
             var ok = gold >= it.price;
             var tierBorder = it.tier ? TIER_COLOR[it.tier] : "#2e1e08";
@@ -96,7 +96,7 @@ export function ShopTab(props) {
                     StatDiff(it)),
                 React.createElement("div", { style: { textAlign: "right", flexShrink: 0 } },
                     React.createElement("div", { style: { fontSize: 11, color: "#f0c060", marginBottom: 3 } }, "💰 ", it.price),
-                    React.createElement("button", { onClick: function () { if (ok) { SFX.buy(); onBuy(it); } }, disabled: !ok, style: Object.assign({}, S.btn, { opacity: ok ? 1 : 0.35 }) }, "Buy"))); }),
+                    React.createElement("button", { onClick: function () { if (ok) { SFX.buy(); onBuy(it); } }, disabled: !ok, style: Object.assign({}, S.btn, { opacity: ok ? 1 : 0.35 }) }, T("Kup", "Buy")))); }),
         React.createElement("div", { style: S.sec }, "🧪 Potions"),
         React.createElement("div", { style: { display: "flex", gap: 7, flexWrap: "wrap" } }, POTIONS.map(function (p) {
             var ok = gold >= p.price;
@@ -105,7 +105,7 @@ export function ShopTab(props) {
                 React.createElement("div", { style: { display:"flex", justifyContent:"center", marginBottom: 4 } },
                     React.createElement(PixelIcon, { name: iconKey, size: 28, fallback: p.emoji })),
                 React.createElement("div", { style: { fontSize: 11, fontWeight: "bold", color: "#44dd88", marginBottom: 1 } }, p.name),
-                React.createElement("div", { style: { fontSize: 10, color: "#3a7a3a", marginBottom: 3 } }, "Heals ", p.heal, " HP"),
+                React.createElement("div", { style: { fontSize: 10, color: "#3a7a3a", marginBottom: 3 } }, T("Leczy ", "Heals "), p.heal, " HP"),
                 React.createElement("div", { style: { fontSize: 10, color: "#f0c060", marginBottom: 4 } }, "💰 ", p.price, "g"),
-                React.createElement("button", { onClick: function () { if (ok) { SFX.buy(); onBuyPotion(p); } }, disabled: !ok, style: { padding: "4px 8px", background: ok ? "#1a3a1a" : "#0a1a0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 11, opacity: ok ? 1 : 0.35 } }, "Buy")); }))));
+                React.createElement("button", { onClick: function () { if (ok) { SFX.buy(); onBuyPotion(p); } }, disabled: !ok, style: { padding: "4px 8px", background: ok ? "#1a3a1a" : "#0a1a0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 11, opacity: ok ? 1 : 0.35 } }, T("Kup", "Buy"))); }))));
 }

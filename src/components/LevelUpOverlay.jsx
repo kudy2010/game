@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PERKS, STAT_LABEL, STAT_COLOR } from '../data.js';
+import { PERKS, STAT_LABEL, STAT_COLOR, T } from '../data.js';
 import { S, ANIM_CSS } from '../styles.js';
 import { SFX } from '../audio.js';
 
@@ -25,7 +25,7 @@ export function LevelUpOverlay(props) {
             React.createElement("div", { style: { fontSize: 22, fontWeight: "bold", color: "#f0c060", marginTop: 2 } },
                 "Level ", luInfo.level)),
         choices && choices.length > 0 && (React.createElement("div", { style: { width: "100%", maxWidth: 340, marginBottom: 14 } },
-            React.createElement("div", { style: S.sec }, "✨ Choose a Perk"),
+            React.createElement("div", { style: S.sec }, T("✨ Wybierz Perk", "✨ Choose a Perk")),
             React.createElement("div", { style: { display: "flex", gap: 7 } }, choices.map(function (pid) {
                 var p = PERKS.find(function (x) { return x.id === pid; });
                 if (!p) return null;
@@ -37,8 +37,8 @@ export function LevelUpOverlay(props) {
             })))),
         React.createElement("div", { style: { width: "100%", maxWidth: 340, marginBottom: 14 } },
             React.createElement("div", { style: S.sec },
-                "📊 Attribute Points ",
-                React.createElement("span", { style: { color: left > 0 ? "#f0c060" : "#44dd88", fontSize: 12 } }, "(", left, " left)")),
+                T("📊 Punkty Atrybutów", "📊 Attribute Points"), " ",
+                React.createElement("span", { style: { color: left > 0 ? "#f0c060" : "#44dd88", fontSize: 12 } }, "(", left, " " + T("zostało", "left") + ")")),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, ["str", "agi", "int", "con"].map(function (stat) {
                 var label = STAT_LABEL[stat], base = hero.stats[stat] || 0, bonus = alloc[stat] || 0, sc = STAT_COLOR[stat];
                 return (React.createElement("div", { key: stat, style: { background: "#0d0801", border: "1px solid " + sc + "33", borderRadius: 6, padding: "8px 10px", display: "flex", alignItems: "center", gap: 8 } },
@@ -51,5 +51,5 @@ export function LevelUpOverlay(props) {
                         React.createElement("button", { onClick: function () { adj(stat, 1); }, disabled: left <= 0, style: { background: "#2a1a06", border: "1px solid " + sc, color: sc, width: 22, height: 22, borderRadius: 3, cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 14, opacity: left > 0 ? 1 : 0.35 } }, "+"),
                         React.createElement("button", { onClick: function () { adj(stat, -1); }, disabled: bonus <= 0, style: { background: "#1e1206", border: "1px solid #4a3210", color: "#9a7030", width: 22, height: 22, borderRadius: 3, cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 14, opacity: bonus > 0 ? 1 : 0.35 } }, "−"))));
             }))),
-        React.createElement("button", { onClick: confirm, disabled: !canDone, style: Object.assign({}, S.bigBtn, { width: "100%", maxWidth: 340, textAlign: "center", fontSize: 14, opacity: canDone ? 1 : 0.4, borderColor: canDone ? "#44dd44" : "#c8a44a", color: canDone ? "#44dd44" : "#c8a44a" }) }, canDone ? "✅ Confirm" : (sel === null && choices && choices.length > 0 ? "← Select a perk first" : "Allocate all points"))));
+        React.createElement("button", { onClick: confirm, disabled: !canDone, style: Object.assign({}, S.bigBtn, { width: "100%", maxWidth: 340, textAlign: "center", fontSize: 14, opacity: canDone ? 1 : 0.4, borderColor: canDone ? "#44dd44" : "#c8a44a", color: canDone ? "#44dd44" : "#c8a44a" }) }, canDone ? T("✅ Potwierdź", "✅ Confirm") : (sel === null && choices && choices.length > 0 ? T("← Najpierw wybierz perk", "← Select a perk first") : T("Przydziel wszystkie punkty", "Allocate all points")))));
 }
