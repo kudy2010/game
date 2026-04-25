@@ -107,7 +107,7 @@ export function App() {
     var _mSong = useState(0);
     var musicSong = _mSong[0];
     var setMusicSong = _mSong[1];
-    var _mVol = useState(0.2);
+    var _mVol = useState(0.05);
     var musicVol = _mVol[0];
     var setMusicVol = _mVol[1];
     var _uiSc = useState(function () { try { var vw = window.innerWidth; return vw < 500 ? Math.round(vw / 500 * 20) / 20 : 1; } catch (e) { return 1; } });
@@ -569,7 +569,7 @@ export function App() {
                     pxKey ? React.createElement(PixelIcon, { name: pxKey, size: 16, style: { opacity: isActive ? 1 : 0.55 } }) : React.createElement("span", { style: { fontSize: 15 } }, t[1]),
                     React.createElement("span", { style: { fontSize: 9, display: "block", marginTop: 1, letterSpacing: 0.3 } }, t[2])); })),
             React.createElement("div", { style: S.body },
-                tab === "hero" && React.createElement(HeroTab, { hero: hero, equipped: equipped, stats: stats, potions: potions, onUnequip: unequipItem, onHeal: onHealHero, onInstantHeal: onInstantHeal }),
+                tab === "hero" && React.createElement(HeroTab, { hero: hero, equipped: equipped, stats: stats, potions: potions, onUnequip: unequipItem, onHeal: onHealHero }),
                 tab === "quests" && React.createElement(QuestsTab, { quests: availQ, questLog: questLog, stamina: stamina, activeJob: activeJob, onStart: function (q) { startTravel("quest", { quest: q }); } }),
                 tab === "inventory" && React.createElement(InventoryTab, { inventory: inventory, hero: hero, potions: potions, onEquip: equipItem, onSell: sellItem, onHeal: onHealHero }),
                 tab === "shop" && React.createElement(ShopTab, { items: ITEMS, gold: gold, potions: potions, onBuy: buyItem, onBuyPotion: buyPotion, heroClass: hero.class, equipped: equipped, shopPool: shopPool, setShopPool: setShopPool, shopSpecial: shopSpecial, setShopSpecial: setShopSpecial, shopRefreshAt: shopRefreshAt, setShopRefreshAt: setShopRefreshAt }),

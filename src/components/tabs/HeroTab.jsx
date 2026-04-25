@@ -7,7 +7,7 @@ import { PixelIcon, CharSprite, classIconKey } from '../icons.jsx';
 
 export function HeroTab(props) {
     var hero = props.hero, equipped = props.equipped, stats = props.stats, potions = props.potions;
-    var onUnequip = props.onUnequip, onHeal = props.onHeal, onInstantHeal = props.onInstantHeal;
+    var onUnequip = props.onUnequip, onHeal = props.onHeal;
     var hpPct = hero.hp / hero.maxHp * 100;
     var xpPct = hero.xp / hero.xpNeeded * 100;
     var perks = hero.perks || [];
@@ -65,8 +65,7 @@ export function HeroTab(props) {
                         potions.medium > 0 && React.createElement("button", { onClick: function () { onHeal("medium", getPotionHeal(60, perks)); }, style: { padding: "4px 9px", background: "#0a1e0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } },
                             "⚗️ +", getPotionHeal(60, perks), " (", potions.medium, ")"),
                         potions.large > 0 && React.createElement("button", { onClick: function () { onHeal("large", getPotionHeal(100, perks)); }, style: { padding: "4px 9px", background: "#0a1e0a", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } },
-                            "🫙 +", getPotionHeal(100, perks), " (", potions.large, ")"))),
-                    React.createElement("button", { onClick: onInstantHeal, style: { padding: "4px 9px", background: "#1e1a06", border: "1px solid #aa7000", color: "#ffaa00", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } }, "⚡ Full Heal [α]"))),
+                            "🫙 +", getPotionHeal(100, perks), " (", potions.large, ")"))))),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 } }, ["str", "agi", "int", "con"].map(function (st) {
                 var sc = STAT_COLOR[st];
                 var isH = hovStat === st;
