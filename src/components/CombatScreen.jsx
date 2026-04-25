@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CLASSES, PERKS, clamp, STAT_COLOR, DMG_TYPE_LABEL, DMG_TYPE_COLOR } from '../data.js';
+import { CLASSES, PERKS, clamp, STAT_COLOR, DMG_TYPE_LABEL, DMG_TYPE_COLOR, COMBAT_LOG, COMBAT_UI, T } from '../data.js';
 import { rollRound, computeStats, getPotionHeal } from '../utils.js';
 import { pickReact } from '../data.js';
 import { S, ANIM_CSS, LC } from '../styles.js';
@@ -30,7 +30,7 @@ export function CombatScreen(props) {
     var _pf = useState({ hero: null, enemy: null });
     var pf = _pf[0];
     var setPf = _pf[1];
-    var _log = useState([{ t: "info", msg: "⚔️ " + enemy.name + " blokuje drogę!" }, { t: "info", msg: "📖 " + (enemy.desc || "Przygotuj się do walki!") }]);
+    var _log = useState([{ t: "info", msg: COMBAT_LOG.blockInitiator(enemy.name) }, { t: "info", msg: "📖 " + (enemy.desc || COMBAT_LOG.enemyIntro) }]);
     var log = _log[0];
     var setLog = _log[1];
     var _flt = useState([]);
@@ -83,16 +83,16 @@ export function CombatScreen(props) {
                 poisonRef.current = Math.max(0, poisonRef.current - 1);
                 setPoisonRounds(poisonRef.current);
                 spawnFloat("☠ " + pdmg, "enemy", false, "#88ff44");
-                addLog("hit", "☠️ Trucizna: " + pdmg + " dmg (" + poisonRef.current + " rund)");
+                addLog("hit", COMBAT_LOG.poisonDamage(pdmg, poisonRef.current));
                 updHP(hHp, eHp);
                 if (eHp <= 0) {
                     setAnim({ hero: "idle", enemy: "dead" });
-                    addLog("win", "🏆 " + enemy.name + " pokonany trucizną!");
+                    addLog("win", COMBAT_LOG.poisonWin(enemy.name));
                     SFX.win(); setOutcome("win"); busyRef.current = false; setBusy(false); return;
                 }
             }
             var forceHit = hero.class === "musketeer" && !firstShotFired.current;
-            if (forceHit) { firstShotFired.current = true; addLog("info", "🎯 Pierwszy Strzał — gwarantowane trafienie!"); }
+            if (forceHit) { firstShotFired.current = true; addLog("info", COMBAT_LOG.firstShot); }
             var pr = rollRound(totalStats, enemy.stats, forceHit);
             if (pr.dmg > 0) {
                 if (heroPerks.indexOf("berserker") >= 0 && hHp < heroMaxHp * 0.3)
@@ -105,7 +105,7 @@ export function CombatScreen(props) {
             }
             if (pr.type === "crit" && hero.class === "alchemist" && poisonRef.current === 0 && Math.random() < 0.2) {
                 poisonRef.current = 3; setPoisonRounds(3);
-                addLog("info", "☠️ Trucizna! 3 rundy × " + (5 + Math.floor((totalStats.int || 0) * 0.3)) + " dmg");
+                addLog("info", COMBAT_LOG.poisonTrigger(5 + Math.floor((totalStats.int || 0) * 0.3)));
                 spawnFloat("☠ TRUCIZNA!", "enemy", true, "#88ff44");
             }
             var newEHp = Math.max(0, eHp - pr.dmg);
@@ -128,10 +128,10 @@ export function CombatScreen(props) {
             else if (pr.type === "block") showReact("enemy", "def", "block");
             updHP(newHHp, newEHp);
             if (sfxM[pr.type]) sfxM[pr.type]();
-            addLog(pr.type, { miss: "❌ Twój atak trafia powietrze.", dodge: "💨 " + enemy.name + " unika ciosu!", block: "🛡️ Zablokowane! " + pr.dmg + " dmg przeszło.", hit: "⚔️ Zadajesz " + pr.dmg + " dmg!", crit: "💥 KRYTYK! " + pr.dmg + " dmg!!!" }[pr.type]);
+            addLog(pr.type, { miss: COMBAT_LOG.playerMiss, dodge: COMBAT_LOG.enemyDodge(enemy.name), block: COMBAT_LOG.playerBlock + pr.dmg + T(" dmg przeszło.", " dmg passed."), hit: COMBAT_LOG.playerHit + pr.dmg + T(" dmg!", " dmg!"), crit: COMBAT_LOG.playerCrit + pr.dmg + T(" dmg!!!", " dmg!!!") }[pr.type]);
             if (hero.class === "knight" && round % 3 === 2) {
                 knightBlockReady.current = true;
-                addLog("info", "🛡️ Stance! Następny atak wroga zablokowany.");
+                addLog("info", COMBAT_LOG.playerStance);
                 spawnFloat("🛡 STANCE", "hero", false, "#e08844");
             }
             return wait(490).then(function () {
@@ -244,7 +244,7 @@ export function CombatScreen(props) {
                 var col       = active ? DMG_TYPE_COLOR[weapDmg] : "#3a2808";
                 var label     = active
                     ? DMG_TYPE_LABEL[weapDmg] + " +20% DMG ✓"
-                    : (prefType ? ("Equip " + DMG_TYPE_LABEL[prefType] + " for +20% DMG") : "");
+                    : (prefType ? COMBAT_UI.equipTip(DMG_TYPE_LABEL[prefType]) : "");
                 return React.createElement("div", { style: { marginTop: 3, textAlign: "center", fontSize: 8, color: col, borderTop: "1px solid #1e1208", paddingTop: 2, letterSpacing: 0.3 } }, label);
             })(),
             (function() {
@@ -279,10 +279,10 @@ export function CombatScreen(props) {
                 "🫙 ", getPotionHeal(100, heroPerks), "hp", React.createElement("br", null),
                 React.createElement("span", { style: { fontSize: 8, color: "#2a5a2a" } }, "×", potions.large)),
             React.createElement("button", { onClick: toggleAuto, style: { flex: 2, padding: "9px 3px", textAlign: "center", background: auto ? "#2a1a06" : "#1e1206", border: "1px solid " + (auto ? "#f0c060" : "#4a3210"), color: auto ? "#f0c060" : "#c8a44a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 5, fontSize: 10 } }, auto ? "⏸ Stop" : "▶ Auto"),
-            React.createElement("button", { onClick: function () { cancelRef.current = true; clearInterval(autoRef.current); onFlee(hp.h); }, style: { flex: 2, padding: "9px 3px", textAlign: "center", background: "#1e1206", border: "1px solid #5a3a2a", color: "#9a5a3a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 5, fontSize: 10 } }, "🏃 Uciekaj"))) : (React.createElement("div", { style: { flex: 1, textAlign: "center", padding: "4px 0" } },
+            React.createElement("button", { onClick: function () { cancelRef.current = true; clearInterval(autoRef.current); onFlee(hp.h); }, style: { flex: 2, padding: "9px 3px", textAlign: "center", background: "#1e1206", border: "1px solid #5a3a2a", color: "#9a5a3a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 5, fontSize: 10 } }, COMBAT_UI.fleeButton))) : (React.createElement("div", { style: { flex: 1, textAlign: "center", padding: "4px 0" } },
             React.createElement("div", { style: { fontSize: 32, margin: "2px 0 6px", filter: outcome === "win" ? "drop-shadow(0 0 12px #44dd44)" : "drop-shadow(0 0 12px #dd4444)" } }, outcome === "win" ? "🏆" : "💀"),
-            React.createElement("button", { onClick: function () { if (outcome === "win") onWin(hp.h); else onLose(hp.h); }, style: { width: "100%", padding: "11px", background: "linear-gradient(180deg,#4a2e08,#2e1e06)", border: "2px solid " + (outcome === "win" ? "#44dd44" : "#dd4444"), color: outcome === "win" ? "#44dd44" : "#dd4444", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 6, fontSize: 13, fontWeight: "bold", boxShadow: "0 0 12px " + (outcome === "win" ? "rgba(68,221,68,0.3)" : "rgba(221,68,68,0.3)") } }, outcome === "win" ? "✅ Zbierz nagrody" : "💀 Odwrót")))),
+            React.createElement("button", { onClick: function () { if (outcome === "win") onWin(hp.h); else onLose(hp.h); }, style: { width: "100%", padding: "11px", background: "linear-gradient(180deg,#4a2e08,#2e1e06)", border: "2px solid " + (outcome === "win" ? "#44dd44" : "#dd4444"), color: outcome === "win" ? "#44dd44" : "#dd4444", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 6, fontSize: 13, fontWeight: "bold", boxShadow: "0 0 12px " + (outcome === "win" ? "rgba(68,221,68,0.3)" : "rgba(221,68,68,0.3)") } }, outcome === "win" ? COMBAT_UI.winButton : COMBAT_UI.loseButton)))),
         React.createElement("div", { style: { flex: 1, padding: "0 10px 12px", display: "flex", flexDirection: "column", minHeight: 100 } },
-            React.createElement("div", { style: { fontSize: 10, color: "#6a5020", marginBottom: 3, textTransform: "uppercase", letterSpacing: 1, flexShrink: 0 } }, "📜 Dziennik walki"),
+            React.createElement("div", { style: { fontSize: 10, color: "#6a5020", marginBottom: 3, textTransform: "uppercase", letterSpacing: 1, flexShrink: 0 } }, COMBAT_UI.combatLog),
             React.createElement("div", { style: { flex: 1, background: "#100b03", border: "1px solid #2a1a06", borderRadius: 6, padding: "5px 9px", overflowY: "auto" } }, log.map(function (e, i) { return React.createElement("div", { key: i, style: { fontSize: 11, color: LC[e.t] || "#c8a44a", padding: "2px 0", borderBottom: i < log.length - 1 ? "1px solid #0f0902" : "none" } }, e.msg); })))));
 }

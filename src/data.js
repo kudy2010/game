@@ -45,6 +45,45 @@ export var CLASS_TAG_INFO = {
 // ── TRANSLATIONS ──────────────────────────────────────────────────────────────
 export var T = function (pl, en) { return (typeof window !== "undefined" && window.__LANG === "en") ? en : pl; };
 
+export var COMBAT_LOG = {
+    playerMiss: T("❌ Twój atak trafia powietrze.", "❌ Your attack misses."),
+    enemyDodge: function(n) { return T("💨 " + n + " unika ciosu!", "💨 " + n + " dodges!"); },
+    playerBlock: T("🛡️ Zablokowane! ", "🛡️ Blocked! "),
+    playerHit: T("⚔️ Zadajesz ", "⚔️ You hit for "),
+    playerCrit: T("💥 KRYTYK! ", "💥 CRITICAL! "),
+    playerStance: T("🛡️ Stance! Następny atak wroga zablokowany.", "🛡️ Stance! Next enemy attack will be blocked."),
+    playerWin: function(n) { return T("🏆 " + n + " pokonany!", "🏆 " + n + " defeated!"); },
+    playerIronWill: T("💪 Żelazna Wola! Przeżyłeś z 1 HP!", "💪 Iron Will! You survived with 1 HP!"),
+    playerHeal: function(t, a) { return T("🧪 " + t + " potion! +" + a + " HP", "🧪 " + t + " potion! +" + a + " HP"); },
+    playerLose: T("💀 Pokonany...", "💀 Defeated..."),
+    blockInitiator: function(n) { return T("⚔️ " + n + " blokuje drogę!", "⚔️ " + n + " blocks the way!"); },
+    enemyIntro: T("📖 Przygotuj się do walki!", "📖 Prepare for battle!"),
+    poisonDamage: function(d, r) { return T("☠️ Trucizna: " + d + " dmg (" + r + " rund)", "☠️ Poison: " + d + " dmg (" + r + " round" + (r !== 1 ? "s" : ") ) "); },
+    poisonWin: function(n) { return T("🏆 " + n + " pokonany trucizną!", "🏆 " + n + " defeated by poison!"); },
+    firstShot: T("🎯 Pierwszy Strzał — gwarantowane trafienie!", "🎯 First Shot — guaranteed hit!"),
+    poisonTrigger: function(d) { return T("☠️ Trucizna! 3 rundy × " + d + " dmg", "☠️ Poison! 3 rounds × " + d + " dmg"); },
+    
+    enemyMiss: function(n) { return T("❌ " + n + " chybia!", "❌ " + n + " misses!"); },
+    playerDodge: T("💨 Unikasz ciosu!", "💨 You dodge!"),
+    playerBlockEnemy: T("🛡️ Blokujesz! ", "🛡️ You block! "),
+    enemyHit: function(n, d) { return T("💢 " + n + " trafia za " + d + "!", "💢 " + n + " hits for " + d + "!"); },
+    enemyCrit: function(n, d) { return T("💥 " + n + " KRYTYK za " + d + "!!!", "💥 " + n + " CRITICAL for " + d + "!!!"); },
+};
+
+export var COMBAT_UI = {
+    statLabels: { hit: T("Traf", "Hit"), crit: T("Kryt", "Crit"), dodge: T("Unik", "Dodge"), block: T("Blok", "Block") },
+    stanceActive: T("🛡 STANCE aktywny — blok gwarantowany!", "🛡 STANCE active — guaranteed block!"),
+    stanceRounds: function(n) { return T("🛡 Stance za " + n + (n === 1 ? " rundę" : " rundy"), "🛡 Stance for " + n + (n === 1 ? " round" : " rounds")); },
+    poisonActive: function(n) { return T("☠ Trucizna aktywna — " + n + (n === 1 ? " runda" : " rundy"), "☠ Poison active — " + n + (n === 1 ? " round" : " rounds")); },
+    poisonChance: T("☠ Trucizna: 20% szans przy krytyku", "☠ Poison: 20% chance on crit"),
+    winButton: T("✅ Zbierz nagrody", "✅ Collect rewards"),
+    loseButton: T("💀 Odwrót", "💀 Retreat"),
+    combatLog: T("📜 Dziennik walki", "📜 Combat Log"),
+    fleeButton: T("🏃 Uciekaj", "🏃 Flee"),
+    equipBonus: function(type) { return T("Wyposażony w " + type + " zapewnia +20% DMG ✓", "Equip " + type + " for +20% DMG ✓"); },
+    equipTip: function(type) { return T("Wyposażenie " + type + " zapewnia +20% DMG", "Equip " + type + " for +20% DMG"); },
+};
+
 // ── QUEST DIFFICULTY ──────────────────────────────────────────────────────────
 export function getQuestDiff(minLevel) {
     if (minLevel <= 1) return { label: "Easy",   color: "#44dd88", bg: "#0a2010", pulse: false };
