@@ -19,8 +19,7 @@ export function CharacterSelectScreen(props) {
     }, []);
     return (React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#0d0801", color: "#c8a44a", fontFamily: "Georgia,serif", textAlign: "center", padding: "20px 16px" } },
         React.createElement("style", null, ANIM_CSS),
-        React.createElement("div", { style: { fontSize: 52, marginBottom: 6 } }, "⚔️💣"),
-        React.createElement("h1", { style: { fontSize: 28, margin: "0 0 4px", textShadow: "0 0 24px rgba(200,164,74,0.35)", letterSpacing: 3 } }, "POWDER & STEEL"),
+        React.createElement("img", { src: "/assets/icons/game_logo.png", alt: "Game Logo", style: { maxWidth: "300px", marginBottom: 6 } }),
         React.createElement("p", { style: { color: "#7a6030", fontSize: 11, maxWidth: 280, margin: "0 0 20px", lineHeight: 1.6 } }, T("Wybierz lub stwórz bohatera", "Choose or create a hero")),
         React.createElement("div", { style: { width: "100%", maxWidth: 380, display: "flex", flexDirection: "column", gap: 10 } }, [0, 1, 2].map(function (slot) {
             var s = saves[slot];
