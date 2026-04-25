@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
+  <title>⚔️ Powder &amp; Steel</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{background:#0d0801;min-height:100%;height:100%;}
+    #root{min-height:100vh;}
+    @supports (height: 100dvh){
+      #root{min-height:100dvh;}
+      #loading{height:100dvh;}
+    }
+    #loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;color:#c8a44a;font-family:Georgia,serif;gap:12px;}
+    body{-webkit-text-size-adjust:100%;overscroll-behavior-y:none;}
+    button, [role="button"]{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+    button{min-height:48px}
+    button:active{transform:translateY(1px)}
+    @media (max-width: 420px){
+      button{min-height:52px}
+    }
+    @keyframes psTipIn{from{opacity:0;transform:translate(-50%,6px) scale(0.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+    .ps-tip{
+      position:absolute;
+      bottom:calc(100% + 10px);
+      left:50%;
+      transform:translateX(-50%);
+      width:min(260px, 78vw);
+      background:#1a1408;
+      border:1px solid #c8a44a;
+      border-radius:10px;
+      padding:10px 12px;
+      z-index:999;
+      box-shadow:0 10px 26px rgba(0,0,0,.78), 0 0 18px rgba(200,164,74,.18);
+      animation:psTipIn .16s ease-out;
+      pointer-events:none;
+    }
+    @media (max-width: 480px){
+      #root{-webkit-font-smoothing: antialiased;}
+    }
+    .ps-tip::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:100%;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:7px solid transparent;
+      border-right:7px solid transparent;
+      border-top:7px solid #c8a44a;
+      filter:drop-shadow(0 6px 8px rgba(0,0,0,.55));
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div id="loading">
+      <div style="font-size:42px">⚔️💣</div>
+      <div style="font-size:16px">Ładowanie...</div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
