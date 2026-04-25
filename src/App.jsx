@@ -110,7 +110,7 @@ export function App() {
     var _mVol = useState(0.05);
     var musicVol = _mVol[0];
     var setMusicVol = _mVol[1];
-    var _uiSc = useState(function () { try { var vw = window.innerWidth; return vw < 500 ? Math.round(vw / 500 * 20) / 20 : 1; } catch (e) { return 1; } });
+    var _uiSc = useState(function () { try { var vw = window.innerWidth; return Math.max(0.7, Math.min(2.5, Math.round(vw / 700 * 10) / 10)); } catch (e) { return 1; } });
     var uiScale = _uiSc[0];
     var setUiScale = _uiSc[1];
     var _sOpen = useState(false);
@@ -455,7 +455,7 @@ export function App() {
         setTab("quests");
     };
     var onTavernResult = function (profit) { if (profit === 0) return; setGold(function (g) { return Math.max(0, g + profit); }); if (profit > 0) notify("🏆 +" + profit + "g!"); else notify("💀 −" + Math.abs(profit) + "g", "err"); };
-    var changeScale = function (v) { setUiScale(Math.max(0.7, Math.min(2.0, Math.round(v * 100) / 100))); };
+    var changeScale = function (v) { setUiScale(Math.max(0.7, Math.min(2.5, Math.round(v * 100) / 100))); };
     var startJob = function (job) { if (activeJob) return; SFX.enter(); setActiveJob({ jobId: job.id, startedAt: Date.now() }); notify(T("💼 Wyruszono do pracy: ", "💼 Left for work: ") + job.emoji + " " + T(job.name, job.nameEn)); };
     var cancelJob = function () { if (!activeJob) return; setActiveJob(null); notify(T("❌ Praca anulowana.", "❌ Job cancelled."), "err"); };
     var drinkBeer = function () {
@@ -537,14 +537,14 @@ export function App() {
                 React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, marginBottom: 6 } },
                     React.createElement("span", { style: { fontSize: 11, color: "#7a6030", whiteSpace: "nowrap" } }, "📐 ", T("Skala", "Scale")),
                     React.createElement("button", { onClick: function () { changeScale(uiScale - 0.05); }, style: Object.assign({}, S.mBtn, { fontSize: 15, lineHeight: 1 }) }, "−"),
-                    React.createElement("input", { type: "range", min: "70", max: "200", value: Math.round(uiScale * 100), onChange: function (e) { changeScale(parseInt(e.target.value) / 100); }, style: { flex: 1 } }),
+                    React.createElement("input", { type: "range", min: "70", max: "250", value: Math.round(uiScale * 100), onChange: function (e) { changeScale(parseInt(e.target.value) / 100); }, style: { flex: 1 } }),
                     React.createElement("button", { onClick: function () { changeScale(uiScale + 0.05); }, style: Object.assign({}, S.mBtn, { fontSize: 15, lineHeight: 1 }) }, "+"),
                     React.createElement("span", { style: { fontSize: 12, fontWeight: "bold", color: "#c8a44a", minWidth: 38, textAlign: "right" } }, Math.round(uiScale * 100), "%"),
-                    React.createElement("button", { onClick: function () { try { var vw = window.innerWidth; changeScale(vw < 500 ? Math.round(vw / 500 * 20) / 20 : 1); } catch (e) { changeScale(1); } }, style: Object.assign({}, S.mBtn, { fontSize: 10, color: "#6a9a6a", border: "1px solid #2a5a2a", borderRadius: 3, padding: "2px 5px" }) }, "Auto")),
+                    React.createElement("button", { onClick: function () { try { var vw = window.innerWidth; changeScale(Math.max(0.7, Math.min(2.5, Math.round(vw / 700 * 10) / 10))); } catch (e) { changeScale(1); } }, style: Object.assign({}, S.mBtn, { fontSize: 10, color: "#6a9a6a", border: "1px solid #2a5a2a", borderRadius: 3, padding: "2px 5px" }) }, "Auto")),
                 React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
                     React.createElement("span", { style: { fontSize: 11, color: "#7a6030" } }, "🌍 ", T("Język", "Language")),
                     React.createElement("button", { onClick: function () { setLang(function (l) { return l === "pl" ? "en" : "pl"; }); }, style: { padding: "3px 10px", background: "#1e1206", border: "1px solid #c8a44a", color: "#c8a44a", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 11 } }, lang === "pl" ? "🇵🇱 Polski → EN" : "🇬🇧 English → PL")),
-                React.createElement("div", { style: { fontSize: 9, color: "#4a3820", letterSpacing: 0.5, marginTop: 4 } }, "📱 Auto fits screen width · Range 70%–200%"),
+                React.createElement("div", { style: { fontSize: 9, color: "#4a3820", letterSpacing: 0.5, marginTop: 4 } }, "📱 Auto fits screen width · Range 70%–250%"),
                 React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginTop: 6, borderTop: "1px solid #2e1e08", paddingTop: 6 } },
                     React.createElement("span", { style: { fontSize: 11, color: "#7a6030" } }, "🐛 DEBUG"),
                     React.createElement("button", { onClick: function () { setDebugMode(function (d) { return !d; }); }, style: { padding: "2px 10px", background: debugMode ? "#3a1a00" : "#1e1206", border: "1px solid " + (debugMode ? "#ff8c00" : "#4a3820"), color: debugMode ? "#ff8c00" : "#4a3820", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 10 } }, debugMode ? "ON" : "OFF"))),
