@@ -105,8 +105,8 @@ export function HeroTab(props) {
         Object.keys(SLOT_EMOJI).map(function (slot) { var it = equipped[slot]; return React.createElement("div", { key: slot, style: Object.assign({}, S.row, { opacity: it ? 1 : 0.45 }) },
             React.createElement(PixelIcon, { name: it ? it.id : slot, size: 24, style: it ? {} : { opacity: 0.45, filter: "grayscale(1) brightness(0.85) drop-shadow(0 1px 2px rgba(0,0,0,0.6))" } }),
             React.createElement("div", { style: { flex: 1, minWidth: 0 } },
-                React.createElement("div", { style: { fontWeight: "bold", fontSize: 12, color: it && it.rarity ? RARITY_COLOR[it.rarity] : "#c8a44a" } }, it ? it.name : "Empty " + slot),
+                React.createElement("div", { style: { fontWeight: "bold", fontSize: 12, color: it && it.rarity ? RARITY_COLOR[it.rarity] : "#c8a44a" } }, it ? it.name : T("Puste ", "Empty ") + slot),
                 it && React.createElement("div", { style: { color: "#7a6030", fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, it.desc),
                 it && React.createElement("div", { style: { fontSize: 10, color: it.rarity ? RARITY_COLOR[it.rarity] : "#c8a44a", marginTop: 1 } }, Object.keys(it.stats).map(function (s) { return "+" + it.stats[s] + " " + s.toUpperCase(); }).join(" · "))),
-            it && React.createElement("button", { onClick: function () { onUnequip(slot); }, style: S.btn }, "Remove")); })));
+            it && React.createElement("button", { onClick: function () { onUnequip(slot); }, style: S.btn }, T("Zdejmij", "Remove"))); })));
 }

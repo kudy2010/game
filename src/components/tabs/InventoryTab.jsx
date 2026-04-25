@@ -16,7 +16,7 @@ export function InventoryTab(props) {
             React.createElement("div", { style: { marginTop: 8 } }, T("Torba pusta. Idź kogoś pobić!", "Inventory empty. Go fight someone!")));
     return (React.createElement("div", null,
         tp > 0 && hero && hero.hp < hero.maxHp && (React.createElement("div", { style: { background: "#0a1e0a", border: "1px solid #2a6a2a", borderRadius: 8, padding: "10px 12px", marginBottom: 10 } },
-            React.createElement("div", { style: { fontSize: 11, color: "#3a8a3a", textTransform: "uppercase", letterSpacing: 1, marginBottom: 7 } }, "🧪 Use Potion"),
+            React.createElement("div", { style: { fontSize: 11, color: "#3a8a3a", textTransform: "uppercase", letterSpacing: 1, marginBottom: 7 } }, T("🧪 Użyj Mikstury", "🧪 Use Potion")),
             React.createElement("div", { style: { display: "flex", gap: 7, flexWrap: "wrap" } },
                 potions.small > 0 && React.createElement("button", { onClick: function () { onHeal("small", getPotionHeal(30, perks)); }, style: { padding: "6px 12px", background: "#0d2a0d", border: "1px solid #2a6a2a", color: "#44dd88", fontFamily: "Georgia,serif", cursor: "pointer", borderRadius: 4, fontSize: 12 } },
                     "🧪 +", getPotionHeal(30, perks), " HP (", potions.small, ")"),
@@ -39,7 +39,7 @@ export function InventoryTab(props) {
                     ItemBadges(it),
                     React.createElement("div", { style: { fontSize: 10, color: col, marginTop: 1 } }, Object.keys(it.stats).map(function (s) { return "+" + it.stats[s] + " " + s.toUpperCase(); }).join(" · "))),
                 React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 3, flexShrink: 0 } },
-                    React.createElement("button", { onClick: function () { onEquip(it); }, style: S.btn }, "Equip"),
+                    React.createElement("button", { onClick: function () { onEquip(it); }, style: S.btn }, T("Załóż", "Equip")),
                     React.createElement("button", { onClick: function () { SFX.sell(); onSell(it); }, style: Object.assign({}, S.btn, { color: "#f0c060", borderColor: "#5a4810" }) },
                         "💰 ", getSellPrice(it), "g"))); })));
 }

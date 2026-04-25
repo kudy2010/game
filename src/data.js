@@ -1,21 +1,21 @@
 // ── PERKS ─────────────────────────────────────────────────────────────────────
 export var PERKS = [
-    { id: "iron_skin", name: "Iron Skin", emoji: "🛡️", desc: "Block chance +10%", sB: { _blockBonus: 10 } },
-    { id: "eagle_eye", name: "Eagle Eye", emoji: "🦅", desc: "Crit hit chance +10%", sB: { _critBonus: 10 } },
-    { id: "fleet_foot", name: "Fleet Foot", emoji: "👟", desc: "Dodge +8%, AGI +3", sB: { agi: 3, _dodgeBonus: 8 } },
-    { id: "sharpshooter", name: "Sharpshooter", emoji: "🎯", desc: "Hit chance +12%", sB: { _hitBonus: 12 } },
-    { id: "brute_force", name: "Brute Force", emoji: "💪", desc: "STR +5", sB: { str: 5 } },
-    { id: "quick_mind", name: "Quick Mind", emoji: "🧠", desc: "INT +5", sB: { int: 5 } },
-    { id: "tough_skin", name: "Tough Skin", emoji: "🪨", desc: "CON +5, max HP +50", sB: { con: 5 }, hpFlat: 50 },
-    { id: "fortified", name: "Fortified", emoji: "🏰", desc: "Flat defense (CON +4)", sB: { con: 4 } },
-    { id: "berserker", name: "Berserker", emoji: "🔥", desc: "+25% damage when HP below 30%", cE: "berserker", cV: 0.25 },
-    { id: "vampiric", name: "Vampiric", emoji: "🩸", desc: "Heal 15% of damage dealt", cE: "vampiric", cV: 0.15 },
-    { id: "resilient", name: "Resilient", emoji: "💚", desc: "Regen 4 HP at end of each round", cE: "regen", cV: 4 },
-    { id: "powder_keg", name: "Powder Keg", emoji: "💥", desc: "Critical hits deal +40% damage", cE: "crit_boost", cV: 0.4 },
-    { id: "iron_will", name: "Iron Will", emoji: "🔒", desc: "Survive one killing blow at 1 HP", cE: "iron_will" },
-    { id: "lucky_strike", name: "Lucky Strike", emoji: "🍀", desc: "10% chance for triple damage", cE: "lucky", cV: 0.1 },
-    { id: "battle_hardened", name: "Battle Hardened", emoji: "⚔️", desc: "Max HP +25%", hpPct: 0.25 },
-    { id: "potion_expert", name: "Potion Expert", emoji: "🧪", desc: "Potions heal 50% more", potionBonus: 0.5 },
+    { id: "iron_skin", name: T("Żelazna Skóra", "Iron Skin"), emoji: "🛡️", desc: T("Szansa na blok +10%", "Block chance +10%"), sB: { _blockBonus: 10 } },
+    { id: "eagle_eye", name: T("Orli Wzrok", "Eagle Eye"), emoji: "🦅", desc: T("Szansa na krytyczne trafienie +10%", "Crit hit chance +10%"), sB: { _critBonus: 10 } },
+    { id: "fleet_foot", name: T("Szybka Noga", "Fleet Foot"), emoji: "👟", desc: T("Unik +8%, AGI +3", "Dodge +8%, AGI +3"), sB: { agi: 3, _dodgeBonus: 8 } },
+    { id: "sharpshooter", name: T("Strzelec Wyborowy", "Sharpshooter"), emoji: "🎯", desc: T("Szansa na trafienie +12%", "Hit chance +12%"), sB: { _hitBonus: 12 } },
+    { id: "brute_force", name: T("Siła Bruta", "Brute Force"), emoji: "💪", desc: T("SIŁA +5", "STR +5"), sB: { str: 5 } },
+    { id: "quick_mind", name: T("Szybki Umysł", "Quick Mind"), emoji: "🧠", desc: T("INT +5", "INT +5"), sB: { int: 5 } },
+    { id: "tough_skin", name: T("Twarda Skóra", "Tough Skin"), emoji: "🪨", desc: T("KON +5, max HP +50", "CON +5, max HP +50"), sB: { con: 5 }, hpFlat: 50 },
+    { id: "fortified", name: T("Umocniony", "Fortified"), emoji: "🏰", desc: T("Płaska obrona (KON +4)", "Flat defense (CON +4)"), sB: { con: 4 } },
+    { id: "berserker", name: T("Berserker", "Berserker"), emoji: "🔥", desc: T("+25% obrażeń gdy HP poniżej 30%", "+25% damage when HP below 30%"), cE: "berserker", cV: 0.25 },
+    { id: "vampiric", name: T("Wampiryczny", "Vampiric"), emoji: "🩸", desc: T("Lecz 15% zadanych obrażeń", "Heal 15% of damage dealt"), cE: "vampiric", cV: 0.15 },
+    { id: "resilient", name: T("Odporny", "Resilient"), emoji: "💚", desc: T("Regeneruj 4 HP na koniec każdej rundy", "Regen 4 HP at end of each round"), cE: "regen", cV: 4 },
+    { id: "powder_keg", name: T("Beczka Prochu", "Powder Keg"), emoji: "💥", desc: T("Krytyczne trafienia zadają +40% obrażeń", "Critical hits deal +40% damage"), cE: "crit_boost", cV: 0.4 },
+    { id: "iron_will", name: T("Żelazna Wola", "Iron Will"), emoji: "🔒", desc: T("Przetrwaj jedno zabójcze uderzenie z 1 HP", "Survive one killing blow at 1 HP"), cE: "iron_will" },
+    { id: "lucky_strike", name: T("Szczęśliwy Cios", "Lucky Strike"), emoji: "🍀", desc: T("10% szans na potrójne obrażenia", "10% chance for triple damage"), cE: "lucky", cV: 0.1 },
+    { id: "battle_hardened", name: T("Zahartowany w Walce", "Battle Hardened"), emoji: "⚔️", desc: T("Max HP +25%", "Max HP +25%"), hpPct: 0.25 },
+    { id: "potion_expert", name: T("Ekspert od Mikstur", "Potion Expert"), emoji: "🧪", desc: T("Mikstury leczą o 50% więcej", "Potions heal 50% more"), potionBonus: 0.5 },
 ];
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
@@ -28,18 +28,18 @@ export var RARITY_GLOW = { common: "none", rare: "0 0 8px #4499ff66", epic: "0 0
 export var SLOT_EMOJI = { weapon: "⚔️", helmet: "🪖", armor: "🛡️", boots: "👢", accessory: "📿" };
 export var TIER_COLOR = { 1: "#9a7a30", 2: "#3a9a6a", 3: "#9a3ac8" };
 export var STAT_COLOR = { str: "#ff6655", agi: "#44ccdd", int: "#cc77ff", con: "#44dd88" };
-export var STAT_LABEL = { str: "⚔️ STR", agi: "🏃 AGI", int: "🧠 INT", con: "❤️ CON" };
+export var STAT_LABEL = { str: T("⚔️ SIŁ", "⚔️ STR"), agi: T("🏃 ZRE", "🏃 AGI"), int: T("🧠 INT", "🧠 INT"), con: T("❤️ KON", "❤️ CON") };
 export var STAMINA_MAX = 100;
 export var STAMINA_REGEN_MS = 3 * 60 * 1000;
 export var STAMINA_COST = { 1: 10, 2: 10, 3: 15, 4: 22, 5: 22, 6: 30 };
 export var BEER_MAX = 3;
 export var BEER_RESTOCK_MS = 45 * 60 * 1000;
-export var DMG_TYPE_LABEL = { physical: "⚔ Physical", ranged: "🎯 Ranged", magical: "✨ Magical" };
+export var DMG_TYPE_LABEL = { physical: T("⚔ Fizyczne", "⚔ Physical"), ranged: T("🎯 Dystansowe", "🎯 Ranged"), magical: T("✨ Magiczne", "✨ Magical") };
 export var DMG_TYPE_COLOR = { physical: "#e08844", ranged: "#44bbdd", magical: "#cc77ff" };
 export var CLASS_TAG_INFO = {
-    knight:    { label: "⚔ Knight",  color: "#e08844", bg: "#2a1400" },
-    musketeer: { label: "🎯 Musk.",  color: "#44bbdd", bg: "#001a2a" },
-    alchemist: { label: "✨ Alch.",  color: "#cc77ff", bg: "#1a0028" },
+    knight:    { label: T("⚔ Rycerz", "⚔ Knight"),  color: "#e08844", bg: "#2a1400" },
+    musketeer: { label: T("🎯 Muszkieter", "🎯 Musk."),  color: "#44bbdd", bg: "#001a2a" },
+    alchemist: { label: T("✨ Alchemik", "✨ Alch."),  color: "#cc77ff", bg: "#1a0028" },
 };
 
 // ── TRANSLATIONS ──────────────────────────────────────────────────────────────
@@ -47,10 +47,10 @@ export var T = function (pl, en) { return (typeof window !== "undefined" && wind
 
 // ── QUEST DIFFICULTY ──────────────────────────────────────────────────────────
 export function getQuestDiff(minLevel) {
-    if (minLevel <= 1) return { label: "Easy",   color: "#44dd88", bg: "#0a2010", pulse: false };
-    if (minLevel <= 3) return { label: "Medium",  color: "#f0c060", bg: "#2a1a04", pulse: false };
-    if (minLevel <= 6) return { label: "Hard",    color: "#ff8844", bg: "#2a1004", pulse: false };
-    return                     { label: "Brutal", color: "#ff4444", bg: "#2a0404", pulse: true  };
+    if (minLevel <= 1) return { label: T("Łatwe", "Easy"),   color: "#44dd88", bg: "#0a2010", pulse: false };
+    if (minLevel <= 3) return { label: T("Średnie", "Medium"),  color: "#f0c060", bg: "#2a1a04", pulse: false };
+    if (minLevel <= 6) return { label: T("Trudne", "Hard"),    color: "#ff8844", bg: "#2a1004", pulse: false };
+    return                     { label: T("Brutalne", "Brutal"), color: "#ff4444", bg: "#2a0404", pulse: true  };
 }
 
 // ── COMBAT REACTIONS ──────────────────────────────────────────────────────────
@@ -72,33 +72,33 @@ export function pickReact(side, role, type) {
 
 // ── CLASSES ───────────────────────────────────────────────────────────────────
 export var CLASSES = {
-    musketeer: { name: "Musketeer", emoji: "🔫", desc: "Swift and deadly from afar. Deals bonus damage with ranged weapons.", preferredType: "ranged", primaryStat: "agi", secondaryStat: "str", stats: { str: 4, agi: 8, int: 5, con: 3 } },
-    knight:    { name: "Knight",    emoji: "⚔️", desc: "Unyielding steel on the battlefield. Deals bonus damage with physical weapons.", preferredType: "physical", primaryStat: "str", secondaryStat: "con", stats: { str: 8, agi: 3, int: 3, con: 8 } },
-    alchemist: { name: "Alchemist", emoji: "⚗️", desc: "Explosive concoctions. Eyebrows optional. Deals bonus damage with magical weapons.", preferredType: "magical", primaryStat: "int", secondaryStat: "agi", stats: { str: 3, agi: 5, int: 10, con: 4 } },
+    musketeer: { name: T("Muszkieter", "Musketeer"), emoji: "🔫", desc: T("Szybki i śmiertelny z daleka. Zadaje bonusowe obrażenia bronią dystansową.", "Swift and deadly from afar. Deals bonus damage with ranged weapons."), preferredType: "ranged", primaryStat: "agi", secondaryStat: "str", stats: { str: 4, agi: 8, int: 5, con: 3 } },
+    knight:    { name: T("Rycerz", "Knight"),    emoji: "⚔️", desc: T("Nieugięta stal na polu bitwy. Zadaje bonusowe obrażenia bronią fizyczną.", "Unyielding steel on the battlefield. Deals bonus damage with physical weapons."), preferredType: "physical", primaryStat: "str", secondaryStat: "con", stats: { str: 8, agi: 3, int: 3, con: 8 } },
+    alchemist: { name: T("Alchemik", "Alchemist"), emoji: "⚗️", desc: T("Eksplozywne mikstury. Brwi opcjonalne. Zadaje bonusowe obrażenia bronią magiczną.", "Explosive concoctions. Eyebrows optional. Deals bonus damage with magical weapons."), preferredType: "magical", primaryStat: "int", secondaryStat: "agi", stats: { str: 3, agi: 5, int: 10, con: 4 } },
 };
 
 // ── ENEMIES ───────────────────────────────────────────────────────────────────
 export var QUEST_ENEMIES = {
-    1: { name: "Drunk Brawler",    emoji: "🍺", hp: 53,  stats: { str: 4,  agi: 3,  int: 1,  con: 4  }, desc: "Smells of ale and regret." },
-    2: { name: "Bandit Leader",    emoji: "🗡️", hp: 98,  stats: { str: 7,  agi: 6,  int: 3,  con: 6  }, desc: "Fancies himself a highwayman." },
-    3: { name: "Goblin Warchief",  emoji: "👺", hp: 165, stats: { str: 7,  agi: 10, int: 4,  con: 6  }, desc: "Surprisingly tactical for his size." },
-    4: { name: "Smuggler Captain", emoji: "🏴‍☠️", hp: 263, stats: { str: 10, agi: 7,  int: 6,  con: 8  }, desc: "Has a pistol. And a backup pistol." },
-    5: { name: "Fort Commander",   emoji: "👮", hp: 450, stats: { str: 14, agi: 7,  int: 7,  con: 13 }, desc: "Actually trained. How inconvenient." },
-    6: { name: "Powder Dragon",    emoji: "🐉", hp: 825, stats: { str: 21, agi: 11, int: 18, con: 15 }, desc: "Breathes fire AND gunpowder." },
+    1: { name: T("Pijany Bójkarz", "Drunk Brawler"),    emoji: "🍺", hp: 53,  stats: { str: 4,  agi: 3,  int: 1,  con: 4  }, desc: T("Śmierdzi piwem i żalem.", "Smells of ale and regret.") },
+    2: { name: T("Przywódca Bandy", "Bandit Leader"),    emoji: "🗡️", hp: 98,  stats: { str: 7,  agi: 6,  int: 3,  con: 6  }, desc: T("Uważa się za rozbójnika.", "Fancies himself a highwayman.") },
+    3: { name: T("Goblin Wojownik", "Goblin Warchief"),  emoji: "👺", hp: 165, stats: { str: 7,  agi: 10, int: 4,  con: 6  }, desc: T("Zaskakująco taktyczny jak na swój rozmiar.", "Surprisingly tactical for his size.") },
+    4: { name: T("Kapitan Przemytników", "Smuggler Captain"), emoji: "🏴‍☠️", hp: 263, stats: { str: 10, agi: 7,  int: 6,  con: 8  }, desc: T("Ma pistolet. I pistolet zapasowy.", "Has a pistol. And a backup pistol.") },
+    5: { name: T("Dowódca Fortu", "Fort Commander"),   emoji: "👮", hp: 450, stats: { str: 14, agi: 7,  int: 7,  con: 13 }, desc: T("Naprawdę wyszkolony. Jak niewygodnie.", "Actually trained. How inconvenient.") },
+    6: { name: T("Smok Prochowy", "Powder Dragon"),    emoji: "🐉", hp: 825, stats: { str: 21, agi: 11, int: 18, con: 15 }, desc: T("Zionie ogniem I prochem strzelniczym.", "Breathes fire AND gunpowder.") },
 };
 export var QUEST_ENEMY_POOLS = {
-    1: [QUEST_ENEMIES[1], { name: "Angry Cook",   emoji: "🍳", hp: 48,  stats: { str: 5, agi: 2, int: 1,  con: 5  }, desc: "Armed with a skillet. Surprisingly lethal." },
-                           { name: "Tavern Thug",  emoji: "🪓", hp: 60,  stats: { str: 6, agi: 3, int: 1,  con: 4  }, desc: "Hired muscle with a very personal grudge." }],
-    2: [QUEST_ENEMIES[2], { name: "Road Cutthroat", emoji: "🔪", hp: 105, stats: { str: 8, agi: 5, int: 2, con: 7 }, desc: "Business is business." },
-                           { name: "Ambush Scout",  emoji: "🏹", hp: 88,  stats: { str: 5, agi: 9, int: 3, con: 4 }, desc: "Prefers to never be seen. Today is different." }],
-    3: [QUEST_ENEMIES[3], { name: "Troll Grunt", emoji: "👹", hp: 190, stats: { str: 10, agi: 4,  int: 1,  con: 10 }, desc: "Not tactical. Just enormous." },
-                           { name: "Hex Shaman",  emoji: "🧙", hp: 155, stats: { str: 4,  agi: 8,  int: 12, con: 5  }, desc: "Smells of mushrooms and bad intentions." }],
-    4: [QUEST_ENEMIES[4], { name: "Powder Saboteur", emoji: "💣", hp: 245, stats: { str: 8,  agi: 9, int: 8, con: 6  }, desc: "Always smells slightly of sulfur." },
-                           { name: "Harbor Master",   emoji: "⚓", hp: 280, stats: { str: 11, agi: 5, int: 5, con: 10 }, desc: "Controls the docks. And your fate." }],
-    5: [QUEST_ENEMIES[5], { name: "Elite Hussar", emoji: "🐴", hp: 420, stats: { str: 12, agi: 11, int: 5,  con: 11 }, desc: "Man and horse. One deadly unit." },
-                           { name: "War Mage",     emoji: "🔮", hp: 400, stats: { str: 6,  agi: 8,  int: 18, con: 10 }, desc: "The most dangerous kind of academic." }],
-    6: [QUEST_ENEMIES[6], { name: "Ancient Drake",     emoji: "🐲", hp: 790, stats: { str: 24, agi: 14, int: 12, con: 14 }, desc: "Older than the kingdom. Much angrier." },
-                           { name: "Corrupted Knight",  emoji: "☠️", hp: 840, stats: { str: 19, agi: 10, int: 15, con: 17 }, desc: "Once honorable. No longer." }],
+    1: [QUEST_ENEMIES[1], { name: T("Wściekły Kucharz", "Angry Cook"),   emoji: "🍳", hp: 48,  stats: { str: 5, agi: 2, int: 1,  con: 5  }, desc: T("Uzbrojony w patelnię. Zaskakująco śmiertelny.", "Armed with a skillet. Surprisingly lethal.") },
+                           { name: T("Ochroniarz Tawerny", "Tavern Thug"),  emoji: "🪓", hp: 60,  stats: { str: 6, agi: 3, int: 1,  con: 4  }, desc: T("Najęta siła z bardzo osobistą urazą.", "Hired muscle with a very personal grudge.") }],
+    2: [QUEST_ENEMIES[2], { name: T("Rozbójnik Drogowy", "Road Cutthroat"), emoji: "🔪", hp: 105, stats: { str: 8, agi: 5, int: 2, con: 7 }, desc: T("Biznes to biznes.", "Business is business.") },
+                           { name: T("Zwiadowca Zasadzki", "Ambush Scout"),  emoji: "🏹", hp: 88,  stats: { str: 5, agi: 9, int: 3, con: 4 }, desc: T("Woli nigdy nie być widzianym. Dzisiaj jest inaczej.", "Prefers to never be seen. Today is different.") }],
+    3: [QUEST_ENEMIES[3], { name: T("Trol Piechur", "Troll Grunt"), emoji: "👹", hp: 190, stats: { str: 10, agi: 4,  int: 1,  con: 10 }, desc: T("Nie taktyczny. Po prostu ogromny.", "Not tactical. Just enormous.") },
+                           { name: T("Szaman Klątw", "Hex Shaman"),  emoji: "🧙", hp: 155, stats: { str: 4,  agi: 8,  int: 12, con: 5  }, desc: T("Śmierdzi grzybami i złymi intencjami.", "Smells of mushrooms and bad intentions.") }],
+    4: [QUEST_ENEMIES[4], { name: T("Sabotażysta Prochu", "Powder Saboteur"), emoji: "💣", hp: 245, stats: { str: 8,  agi: 9, int: 8, con: 6  }, desc: T("Zawsze lekko śmierdzi siarką.", "Always smells slightly of sulfur.") },
+                           { name: T("Władca Portu", "Harbor Master"),   emoji: "⚓", hp: 280, stats: { str: 11, agi: 5, int: 5, con: 10 }, desc: T("Kontroluje doki. I twój los.", "Controls the docks. And your fate.") }],
+    5: [QUEST_ENEMIES[5], { name: T("Elitarny Husarz", "Elite Hussar"), emoji: "🐴", hp: 420, stats: { str: 12, agi: 11, int: 5,  con: 11 }, desc: T("Człowiek i koń. Jedna śmiercionośna jednostka.", "Man and horse. One deadly unit.") },
+                           { name: T("Mag Wojny", "War Mage"),     emoji: "🔮", hp: 400, stats: { str: 6,  agi: 8,  int: 18, con: 10 }, desc: T("Najniebezpieczniejszy rodzaj akademika.", "The most dangerous kind of academic.") }],
+    6: [QUEST_ENEMIES[6], { name: T("Starożytny Smok", "Ancient Drake"),     emoji: "🐲", hp: 790, stats: { str: 24, agi: 14, int: 12, con: 14 }, desc: T("Starszy niż królestwo. Dużo wścieklejszy.", "Older than the kingdom. Much angrier.") },
+                           { name: T("Skażony Rycerz", "Corrupted Knight"),  emoji: "☠️", hp: 840, stats: { str: 19, agi: 10, int: 15, con: 17 }, desc: T("Kiedyś honorowy. Już nie.", "Once honorable. No longer.") }],
 };
 export function getQuestEnemy(id) { var p = QUEST_ENEMY_POOLS[id]; return p ? Object.assign({}, p[rng(0, p.length - 1)]) : Object.assign({}, QUEST_ENEMIES[id]); }
 export function scaleEnemy(enemy, heroLevel) {
@@ -116,12 +116,12 @@ export function scaleEnemy(enemy, heroLevel) {
 
 // ── QUESTS ────────────────────────────────────────────────────────────────────
 export var QUESTS = [
-    { id: 1, name: "Tavern Brawl",         desc: "Sort out a disagreement at the local tavern. With fists.",         travel: 5,  minLevel: 1, xp: 15,  gold: [5,   15],  lootChance: 0.3  },
-    { id: 2, name: "Bandit Camp",           desc: "Clear out bandits taxing travelers (not for the crown).",          travel: 8,  minLevel: 1, xp: 30,  gold: [10,  25],  lootChance: 0.4  },
-    { id: 3, name: "Goblin Warren",         desc: "A goblin infestation. They smell worse than they fight.",          travel: 12, minLevel: 2, xp: 60,  gold: [20,  40],  lootChance: 0.5  },
-    { id: 4, name: "Smugglers' Den",        desc: "Contraband powder kegs. Someone has to confiscate them.",          travel: 15, minLevel: 3, xp: 100, gold: [35,  60],  lootChance: 0.55 },
-    { id: 5, name: "Fort Greywall",         desc: "Storming a fort. What could possibly go wrong?",                   travel: 20, minLevel: 5, xp: 180, gold: [60,  100], lootChance: 0.65 },
-    { id: 6, name: "Dragon's Powder Hoard", desc: "A dragon hoarding gunpowder. Genius or catastrophic.",             travel: 30, minLevel: 8, xp: 350, gold: [120, 200], lootChance: 0.75 },
+    { id: 1, name: T("Bójka w Tawernie", "Tavern Brawl"),         desc: T("Rozwiąż spór w lokalnej tawernie. Pięściami.", "Sort out a disagreement at the local tavern. With fists."),         travel: 5,  minLevel: 1, xp: 15,  gold: [5,   15],  lootChance: 0.3  },
+    { id: 2, name: T("Obóz Bandy", "Bandit Camp"),           desc: T("Wyczyść bandytów pobierających haracz od podróżnych (nie dla korony).", "Clear out bandits taxing travelers (not for the crown)."),          travel: 8,  minLevel: 1, xp: 30,  gold: [10,  25],  lootChance: 0.4  },
+    { id: 3, name: T("Nora Goblinów", "Goblin Warren"),         desc: T("Inwazja goblinów. Śmierdzą gorzej niż walczą.", "A goblin infestation. They smell worse than they fight."),          travel: 12, minLevel: 2, xp: 60,  gold: [20,  40],  lootChance: 0.5  },
+    { id: 4, name: T("Jaskinia Przemytników", "Smugglers' Den"),        desc: T("Kontrabandowe beczki prochu. Ktoś musi je skonfiskować.", "Contraband powder kegs. Someone has to confiscate them."),          travel: 15, minLevel: 3, xp: 100, gold: [35,  60],  lootChance: 0.55 },
+    { id: 5, name: T("Fort Greywall", "Fort Greywall"),         desc: T("Szturm na fort. Co może pójść nie tak?", "Storming a fort. What could possibly go wrong?"),                   travel: 20, minLevel: 5, xp: 180, gold: [60,  100], lootChance: 0.65 },
+    { id: 6, name: T("Skarb Smoka z Prochem", "Dragon's Powder Hoard"), desc: T("Smok gromadzący proch strzelniczy. Geniusz czy katastrofa.", "A dragon hoarding gunpowder. Genius or catastrophic."),             travel: 30, minLevel: 8, xp: 350, gold: [120, 200], lootChance: 0.75 },
 ];
 export function getStaminaCost(q) { return STAMINA_COST[q.id] || 15; }
 
@@ -200,9 +200,9 @@ export var DUNGEON_ITEMS = [
 ];
 
 export var POTIONS = [
-    { id: "p1", name: "Small Potion",  emoji: "🧪", heal: 30,  price: 20, desc: "Tastes of strawberries and despair." },
-    { id: "p2", name: "Medium Potion", emoji: "⚗️", heal: 60,  price: 40, desc: "The medium amount of questionable." },
-    { id: "p3", name: "Large Potion",  emoji: "🫙", heal: 100, price: 75, desc: "Glows slightly. Probably fine." },
+    { id: "p1", name: T("Mała Mikstura", "Small Potion"),  emoji: "🧪", heal: 30,  price: 20, desc: T("Smakuje truskawkami i rozpaczą.", "Tastes of strawberries and despair.") },
+    { id: "p2", name: T("Średnia Mikstura", "Medium Potion"), emoji: "⚗️", heal: 60,  price: 40, desc: T("Średnia ilość wątpliwego.", "The medium amount of questionable.") },
+    { id: "p3", name: T("Duża Mikstura", "Large Potion"),  emoji: "🫙", heal: 100, price: 75, desc: T("Słabo świeci. Prawdopodobnie w porządku.", "Glows slightly. Probably fine.") },
 ];
 
 export var DUNGEONS = [
